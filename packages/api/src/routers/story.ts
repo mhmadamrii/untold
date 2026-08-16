@@ -35,7 +35,11 @@ const updateStoryInput = storyFieldsSchema.partial().extend({
   status: storyStatusSchema.optional(),
 });
 
-async function findOwnedStory(db: Context['db'], id: string, userId: string) {
+export async function findOwnedStory(
+  db: Context['db'],
+  id: string,
+  userId: string,
+) {
   const story = await db.story.findUnique({ where: { id } });
   if (!story || story.authorId !== userId) {
     throw new ORPCError('NOT_FOUND', { message: 'Story not found' });
