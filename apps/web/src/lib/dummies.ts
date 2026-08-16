@@ -1,4 +1,4 @@
-import { StoryStatus, StoryType, Visibility } from '@untold/db';
+import { StoryStatus, StoryType, Visibility } from '@untold/db/enums';
 
 export type DummyStory = {
   id: string;
