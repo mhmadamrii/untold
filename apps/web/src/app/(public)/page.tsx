@@ -17,6 +17,8 @@
 import { Button } from '@untold/ui/components/button';
 import Link from 'next/link';
 
+import { PopularStories } from '@/components/popular-stories';
+
 export default function LandingPage() {
   return (
     <div className='px-6'>
@@ -132,6 +134,22 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <div className='mx-auto h-px max-w-6xl bg-border' />
+
+      {/* Popular stories */}
+      <section className='mx-auto max-w-6xl py-20 md:py-28'>
+        <h2 className='cn-font-heading text-3xl italic'>
+          Stories people are reading.
+        </h2>
+        <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
+          Shared publicly by other writers. Read freely — sign in to keep
+          reading the rest, like a story, or leave a comment.
+        </p>
+        <div className='mt-10'>
+          <PopularStories />
         </div>
       </section>
 
