@@ -9,6 +9,7 @@ import type * as React from 'react';
 
 function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: shadcn vendor component, role=group is intentional here
     <div
       data-slot='input-group'
       role='group'
@@ -53,6 +54,8 @@ function InputGroupAddon({
   ...props
 }: React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: shadcn vendor component, role=group is intentional here
+    // biome-ignore lint/a11y/useKeyWithClickEvents: click only focuses the sibling input/textarea, no keyboard-only action to duplicate
     <div
       role='group'
       data-slot='input-group-addon'
