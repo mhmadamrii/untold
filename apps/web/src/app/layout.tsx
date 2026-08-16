@@ -1,23 +1,31 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Fraunces, Lora, Plus_Jakarta_Sans } from 'next/font/google';
 
 import '../index.css';
 import Header from '@/components/header';
 import Providers from '@/components/providers';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const fraunces = Fraunces({
+  variable: '--font-fraunces',
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: '--font-jakarta',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const lora = Lora({
+  variable: '--font-lora',
   subsets: ['latin'],
+  style: ['normal', 'italic'],
 });
 
 export const metadata: Metadata = {
-  title: 'untold',
-  description: 'untold',
+  title: 'Untold — Everyone has a story',
+  description:
+    "Untold helps you find the story inside your memories, ideas, and unfinished thoughts, and turns it into something you're proud to have written.",
 };
 
 export default function RootLayout({
@@ -28,10 +36,10 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${fraunces.variable} ${plusJakartaSans.variable} ${lora.variable} antialiased`}
       >
         <Providers>
-          <div className='grid grid-rows-[auto_1fr] h-svh'>
+          <div className='flex min-h-svh flex-col'>
             <Header />
             {children}
           </div>
