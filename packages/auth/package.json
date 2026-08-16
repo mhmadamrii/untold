@@ -1,0 +1,24 @@
+{
+  "name": "@untold/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@untold/db": "workspace:*",
+    "@untold/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@untold/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,3 @@
+{
+  "extends": "@untold/config/tsconfig.base.json"
+}
