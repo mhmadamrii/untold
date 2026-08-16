@@ -1,6 +1,6 @@
-import "@untold/env/web";
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-import type { NextConfig } from "next";
+import '@untold/env/web';
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   typedRoutes: true,

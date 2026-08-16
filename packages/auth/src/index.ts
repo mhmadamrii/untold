@@ -1,14 +1,14 @@
-import { createPrismaClient } from "@untold/db";
-import { env } from "@untold/env/server";
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
+import { createPrismaClient } from '@untold/db';
+import { env } from '@untold/env/server';
+import { betterAuth } from 'better-auth';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
 
 export function createAuth() {
   const prisma = createPrismaClient();
 
   return betterAuth({
     database: prismaAdapter(prisma, {
-      provider: "postgresql",
+      provider: 'postgresql',
     }),
 
     trustedOrigins: [env.CORS_ORIGIN],
@@ -19,7 +19,7 @@ export function createAuth() {
     baseURL: env.BETTER_AUTH_URL,
     advanced: {
       defaultCookieAttributes: {
-        sameSite: "none",
+        sameSite: 'none',
         secure: true,
         httpOnly: true,
       },

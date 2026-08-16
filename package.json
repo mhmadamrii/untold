@@ -2,10 +2,7 @@
   "name": "untold",
   "private": true,
   "workspaces": {
-    "packages": [
-      "apps/*",
-      "packages/*"
-    ],
+    "packages": ["apps/*", "packages/*"],
     "catalog": {
       "dotenv": "^17.4.2",
       "zod": "^4.4.3",
@@ -33,6 +30,10 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "check-types": "turbo run check-types",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
     "dev:web": "turbo run dev -F web --",
     "dev:server": "turbo run dev -F server --",
     "db:push": "turbo run db:push -F @untold/db --",
@@ -48,6 +49,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.8",
     "@cloudflare/workers-types": "catalog:",
     "@types/node": "^22.20.1",
     "@untold/config": "workspace:*",

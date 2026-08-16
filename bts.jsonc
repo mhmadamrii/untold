@@ -12,7 +12,7 @@
   "createdAt": "2026-08-16T12:57:41.367Z",
   "reproducibleCommand": "bun create better-t-stack@latest untold --frontend next --backend hono --runtime workers --database postgres --orm prisma --api orpc --auth better-auth --payments none --addons turborepo --examples none --db-setup neon --manual-db --web-deploy cloudflare --server-deploy cloudflare --git --package-manager bun --install",
   "dbSetupOptions": {
-    "mode": "manual",
+    "mode": "manual"
   },
   "database": "postgres",
   "orm": "prisma",
@@ -27,5 +27,5 @@
   "dbSetup": "neon",
   "api": "orpc",
   "webDeploy": "cloudflare",
-  "serverDeploy": "cloudflare",
+  "serverDeploy": "cloudflare"
 }

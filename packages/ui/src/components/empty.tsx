@@ -1,12 +1,12 @@
-import { cn } from "@untold/ui/lib/utils";
-import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from '@untold/ui/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-function Empty({ className, ...props }: React.ComponentProps<"div">) {
+function Empty({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      data-slot="empty"
+      data-slot='empty'
       className={cn(
-        "flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-none border-dashed p-6 text-center text-balance md:p-12",
+        'flex w-full min-w-0 flex-1 flex-col items-center justify-center gap-4 rounded-none border-dashed p-6 text-center text-balance md:p-12',
         className,
       )}
       {...props}
@@ -14,39 +14,39 @@ function Empty({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-function EmptyHeader({ className, ...props }: React.ComponentProps<"div">) {
+function EmptyHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      data-slot="empty-header"
-      className={cn("flex max-w-sm flex-col items-center gap-2", className)}
+      data-slot='empty-header'
+      className={cn('flex max-w-sm flex-col items-center gap-2', className)}
       {...props}
     />
   );
 }
 
 const emptyMediaVariants = cva(
-  "mb-2 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  'mb-2 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0',
   {
     variants: {
       variant: {
-        default: "bg-transparent",
+        default: 'bg-transparent',
         icon: "flex size-10 shrink-0 items-center justify-center rounded-none bg-muted text-foreground [&_svg:not([class*='size-'])]:size-5",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: 'default',
     },
   },
 );
 
 function EmptyMedia({
   className,
-  variant = "default",
+  variant = 'default',
   ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof emptyMediaVariants>) {
+}: React.ComponentProps<'div'> & VariantProps<typeof emptyMediaVariants>) {
   return (
     <div
-      data-slot="empty-icon"
+      data-slot='empty-icon'
       data-variant={variant}
       className={cn(emptyMediaVariants({ variant, className }))}
       {...props}
@@ -54,22 +54,12 @@ function EmptyMedia({
   );
 }
 
-function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
+function EmptyTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      data-slot="empty-title"
-      className={cn("cn-font-heading text-sm font-medium tracking-tight", className)}
-      {...props}
-    />
-  );
-}
-
-function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
-  return (
-    <div
-      data-slot="empty-description"
+      data-slot='empty-title'
       className={cn(
-        "text-sm/relaxed text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary",
+        'cn-font-heading text-sm font-medium tracking-tight',
         className,
       )}
       {...props}
@@ -77,12 +67,12 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
   );
 }
 
-function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
+function EmptyDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
     <div
-      data-slot="empty-content"
+      data-slot='empty-description'
       className={cn(
-        "flex w-full max-w-sm min-w-0 flex-col items-center gap-4 text-sm text-balance",
+        'text-sm/relaxed text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary',
         className,
       )}
       {...props}
@@ -90,4 +80,24 @@ function EmptyContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
-export { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia };
+function EmptyContent({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='empty-content'
+      className={cn(
+        'flex w-full max-w-sm min-w-0 flex-col items-center gap-4 text-sm text-balance',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+};
