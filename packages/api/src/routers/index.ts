@@ -2,6 +2,7 @@ import type { RouterClient } from '@orpc/server';
 
 import { protectedProcedure, publicProcedure } from '../index';
 import { chapterRouter } from './chapter';
+import { commentRouter } from './comment';
 import { storyRouter } from './story';
 
 export const appRouter = {
@@ -16,6 +17,7 @@ export const appRouter = {
   }),
   story: storyRouter,
   chapter: chapterRouter,
+  comment: commentRouter,
 };
 export type AppRouter = typeof appRouter;
 export type AppRouterClient = RouterClient<typeof appRouter>;

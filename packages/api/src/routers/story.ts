@@ -3,7 +3,14 @@ import { StoryStatus, StoryType, Visibility } from '@untold/db';
 import { z } from 'zod';
 
 import type { Context } from '../context';
-import { protectedProcedure } from '../index';
+import { protectedProcedure, publicProcedure } from '../index';
+
+// Anonymous readers get this many chapters in full; the rest are returned
+// as locked previews (title + short excerpt, no full content) until they
+// sign in. Keeps the "read some, then blur" gate enforced server-side
+// rather than trusting the client to hide content it already received.
+const FREE_CHAPTER_COUNT = 1;
+const LOCKED_PREVIEW_LENGTH = 180;
 
 const storyTypeSchema = z.enum(
   Object.values(StoryType) as [StoryType, ...StoryType[]],
@@ -42,6 +49,21 @@ export async function findOwnedStory(
 ) {
   const story = await db.story.findUnique({ where: { id } });
   if (!story || story.authorId !== userId) {
+    throw new ORPCError('NOT_FOUND', { message: 'Story not found' });
+  }
+  return story;
+}
+
+// A story is viewable by: its owner (any visibility), anyone when PUBLIC,
+// or anyone with the id/link when LINK. PRIVATE is owner-only.
+export async function findViewableStory(
+  db: Context['db'],
+  id: string,
+  userId: string | undefined,
+) {
+  const story = await db.story.findUnique({ where: { id } });
+  const isOwner = !!userId && story?.authorId === userId;
+  if (!story || (story.visibility === Visibility.PRIVATE && !isOwner)) {
     throw new ORPCError('NOT_FOUND', { message: 'Story not found' });
   }
   return story;
@@ -94,5 +116,116 @@ export const storyRouter = {
       await findOwnedStory(context.db, input.id, context.session.user.id);
       await context.db.story.delete({ where: { id: input.id } });
       return { success: true };
+    }),
+
+  // Public "top stories" feed for the landing page — most-liked public
+  // stories, newest first as a tiebreak.
+  discover: publicProcedure
+    .input(z.object({ limit: z.number().int().min(1).max(20).default(7) }))
+    .handler(async ({ input, context }) => {
+      const stories = await context.db.story.findMany({
+        where: { visibility: Visibility.PUBLIC },
+        orderBy: [{ likes: { _count: 'desc' } }, { updatedAt: 'desc' }],
+        take: input.limit,
+        include: {
+          author: { select: { name: true } },
+          _count: { select: { chapters: true, likes: true, comments: true } },
+        },
+      });
+
+      return stories.map((story) => ({
+        id: story.id,
+        title: story.title,
+        description: story.description,
+        coverImage: story.coverImage,
+        storyType: story.storyType,
+        author: story.author,
+        chapterCount: story._count.chapters,
+        likeCount: story._count.likes,
+        commentCount: story._count.comments,
+        updatedAt: story.updatedAt,
+      }));
+    }),
+
+  // Public story reader. Anonymous visitors get the first FREE_CHAPTER_COUNT
+  // chapters in full and locked previews for the rest; signed-in viewers who
+  // can view the story (owner, or PUBLIC/LINK) get everything.
+  getPublicById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .handler(async ({ input, context }) => {
+      const userId = context.session?.user.id;
+      await findViewableStory(context.db, input.id, userId);
+
+      const story = await context.db.story.findUniqueOrThrow({
+        where: { id: input.id },
+        include: {
+          author: { select: { name: true } },
+          chapters: { orderBy: { order: 'asc' } },
+          _count: { select: { likes: true, comments: true } },
+        },
+      });
+
+      const liked = userId
+        ? (await context.db.like.findUnique({
+            where: { userId_storyId: { userId, storyId: story.id } },
+          })) !== null
+        : false;
+
+      const chapters = story.chapters.map((chapter, index) => {
+        const unlocked = userId !== undefined || index < FREE_CHAPTER_COUNT;
+        if (unlocked) {
+          return { ...chapter, locked: false as const, preview: null };
+        }
+        return {
+          id: chapter.id,
+          storyId: chapter.storyId,
+          title: chapter.title,
+          order: chapter.order,
+          createdAt: chapter.createdAt,
+          updatedAt: chapter.updatedAt,
+          content: null,
+          locked: true as const,
+          preview: chapter.content.slice(0, LOCKED_PREVIEW_LENGTH),
+        };
+      });
+
+      return {
+        id: story.id,
+        title: story.title,
+        description: story.description,
+        coverImage: story.coverImage,
+        storyType: story.storyType,
+        visibility: story.visibility,
+        author: story.author,
+        likeCount: story._count.likes,
+        commentCount: story._count.comments,
+        liked,
+        chapters,
+      };
+    }),
+
+  toggleLike: protectedProcedure
+    .input(z.object({ storyId: z.string() }))
+    .handler(async ({ input, context }) => {
+      const userId = context.session.user.id;
+      await findViewableStory(context.db, input.storyId, userId);
+
+      const existing = await context.db.like.findUnique({
+        where: { userId_storyId: { userId, storyId: input.storyId } },
+      });
+
+      if (existing) {
+        await context.db.like.delete({ where: { id: existing.id } });
+      } else {
+        await context.db.like.create({
+          data: { userId, storyId: input.storyId },
+        });
+      }
+
+      const likeCount = await context.db.like.count({
+        where: { storyId: input.storyId },
+      });
+
+      return { liked: !existing, likeCount };
     }),
 };
