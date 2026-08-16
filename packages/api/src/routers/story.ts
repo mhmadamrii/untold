@@ -25,7 +25,6 @@ const storyStatusSchema = z.enum(
 const storyFieldsSchema = z.object({
   title: z.string().trim().min(1).max(200),
   description: z.string().trim().max(2000).optional(),
-  notes: z.string().max(20000).optional(),
   topic: z.string().trim().max(200).optional(),
   category: z.string().trim().max(200).optional(),
   storyType: storyTypeSchema.optional(),
@@ -35,7 +34,12 @@ const storyFieldsSchema = z.object({
   visibility: visibilitySchema.optional(),
 });
 
-const createStoryInput = storyFieldsSchema;
+// The first note a story is created with (the big "what's on your mind"
+// textarea on /stories/new). Further notes are added one at a time through
+// the `note` router once the story exists.
+const createStoryInput = storyFieldsSchema.extend({
+  notes: z.string().trim().max(20_000).optional(),
+});
 
 const updateStoryInput = storyFieldsSchema.partial().extend({
   id: z.string(),
@@ -83,7 +87,10 @@ export const storyRouter = {
     .handler(async ({ input, context }) => {
       const story = await context.db.story.findUnique({
         where: { id: input.id },
-        include: { chapters: { orderBy: { order: 'asc' } } },
+        include: {
+          notes: { orderBy: { order: 'asc' } },
+          chapters: { orderBy: { order: 'asc' } },
+        },
       });
       if (!story || story.authorId !== context.session.user.id) {
         throw new ORPCError('NOT_FOUND', { message: 'Story not found' });
@@ -94,11 +101,14 @@ export const storyRouter = {
   create: protectedProcedure
     .input(createStoryInput)
     .handler(async ({ input, context }) => {
+      const { notes, ...data } = input;
       return context.db.story.create({
         data: {
-          ...input,
+          ...data,
           authorId: context.session.user.id,
+          notes: notes ? { create: [{ content: notes, order: 0 }] } : undefined,
         },
+        include: { notes: { orderBy: { order: 'asc' } } },
       });
     }),
 

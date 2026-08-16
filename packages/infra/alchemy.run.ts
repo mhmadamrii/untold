@@ -18,6 +18,11 @@ export const server = Cloudflare.Worker('server', {
     CORS_ORIGIN: Config.string('CORS_ORIGIN'),
     BETTER_AUTH_SECRET: Config.redacted('BETTER_AUTH_SECRET'),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
+    // Optional until the Gemini key is added to apps/server/.env — defaults
+    // to empty rather than failing stack startup when absent.
+    GEMINI_API_KEY: Config.string('GEMINI_API_KEY').pipe(
+      Config.withDefault(''),
+    ),
   },
   dev: {
     port: 3000,
