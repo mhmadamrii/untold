@@ -1,0 +1,68 @@
+enum StoryType {
+  PERSONAL
+  MEMOIR
+  LIFE_EXPERIENCE
+  FICTION
+  SHORT_STORY
+  NOVEL
+  ROMANCE
+  MYSTERY
+  FANTASY
+  ADVENTURE
+  HORROR
+  HISTORICAL
+  INSPIRATIONAL
+  CHILDRENS_STORY
+}
+
+enum StoryStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Visibility {
+  PRIVATE
+  LINK
+  PUBLIC
+}
+
+model Story {
+  id             String      @id @default(cuid())
+  authorId       String
+  author         User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?
+  notes          String?
+  topic          String?
+  category       String?
+  storyType      StoryType?
+  aiInstructions String?
+  coverImage     String?
+  tags           String[]    @default([])
+  status         StoryStatus @default(DRAFT)
+  visibility     Visibility  @default(PRIVATE)
+  shareSlug      String?     @unique
+  chapters       Chapter[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([authorId])
+  @@index([visibility])
+  @@map("story")
+}
+
+model Chapter {
+  id        String   @id @default(cuid())
+  storyId   String
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  title     String
+  content   String   @default("")
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storyId, order])
+  @@index([storyId])
+  @@map("chapter")
+}
