@@ -4,6 +4,13 @@ import Link from 'next/link';
 import { ModeToggle } from './mode-toggle';
 import UserMenu from './user-menu';
 
+const navLinks = [
+  { href: '/dashboard', label: 'Home' },
+  { href: '/stories', label: 'My Stories' },
+  { href: '/discover', label: 'Discover' },
+  { href: '/shared', label: 'Shared' },
+] as const;
+
 export default function Header() {
   return (
     <header className='border-b border-border'>
@@ -15,12 +22,17 @@ export default function Header() {
           Untold
         </Link>
         <div className='flex items-center gap-6'>
-          <Link
-            href='/dashboard'
-            className='text-sm text-muted-foreground transition-colors hover:text-foreground'
-          >
-            Dashboard
-          </Link>
+          <nav className='flex items-center gap-5'>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className='text-sm text-muted-foreground transition-colors hover:text-foreground'
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
           <ModeToggle />
           <UserMenu />
         </div>
