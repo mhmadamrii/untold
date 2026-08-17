@@ -131,10 +131,18 @@ export const storyRouter = {
   // Public "top stories" feed for the landing page — most-liked public
   // stories, newest first as a tiebreak.
   discover: publicProcedure
-    .input(z.object({ limit: z.number().int().min(1).max(20).default(7) }))
+    .input(
+      z.object({
+        limit: z.number().int().min(1).max(50).default(7),
+        storyType: storyTypeSchema.optional(),
+      }),
+    )
     .handler(async ({ input, context }) => {
       const stories = await context.db.story.findMany({
-        where: { visibility: Visibility.PUBLIC },
+        where: {
+          visibility: Visibility.PUBLIC,
+          storyType: input.storyType,
+        },
         orderBy: [{ likes: { _count: 'desc' } }, { updatedAt: 'desc' }],
         take: input.limit,
         include: {

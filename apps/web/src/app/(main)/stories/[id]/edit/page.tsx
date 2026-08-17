@@ -2,6 +2,17 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { StoryStatus, Visibility } from '@untold/db/enums';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@untold/ui/components/alert-dialog';
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import {
@@ -22,7 +33,7 @@ import {
 } from '@untold/ui/components/select';
 import { Skeleton } from '@untold/ui/components/skeleton';
 import { Textarea } from '@untold/ui/components/textarea';
-import { PlusIcon, XIcon } from 'lucide-react';
+import { PlusIcon, TrashIcon, XIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -122,6 +133,16 @@ export default function StoryWorkspacePage({
     }),
   );
 
+  const deleteStory = useMutation(
+    orpc.story.delete.mutationOptions({
+      onSuccess: () => {
+        toast.success('Story deleted.');
+        router.push('/stories');
+      },
+      onError: (error) => toast.error(error.message),
+    }),
+  );
+
   const [title, setTitle] = useState('');
   const titleInitialized = useRef(false);
   useEffect(() => {
@@ -155,11 +176,12 @@ export default function StoryWorkspacePage({
   const data = story.data;
 
   return (
-    <div className='mx-auto max-w-6xl px-6 py-10'>
+    <div className='mx-auto max-w-6xl px-6 py-10 border border-blue-500'>
       <div className='flex flex-wrap items-center gap-3 border-b border-border pb-6'>
         <Button
           variant='outline'
           size='sm'
+          nativeButton={false}
           render={
             <a href={`/stories/${id}`} target='_blank' rel='noreferrer' />
           }
@@ -221,6 +243,34 @@ export default function StoryWorkspacePage({
         >
           Post
         </Button>
+
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={<Button variant='destructive' size='sm' />}
+          >
+            <TrashIcon data-icon='inline-start' />
+            Delete
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete this story?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This permanently deletes &ldquo;{data.title}&rdquo;, along with
+                all of its notes and chapters. This can&rsquo;t be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant='destructive'
+                disabled={deleteStory.isPending}
+                onClick={() => deleteStory.mutate({ id })}
+              >
+                {deleteStory.isPending ? 'Deleting...' : 'Delete story'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       <div className='mt-10 grid gap-10 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]'>
@@ -304,9 +354,9 @@ export default function StoryWorkspacePage({
                 Topic
               </p>
               <Select
-                value={data.topic ?? undefined}
+                value={data.topic ?? ''}
                 onValueChange={(value) =>
-                  updateStory.mutate({ id, topic: value ?? undefined })
+                  updateStory.mutate({ id, topic: value || undefined })
                 }
               >
                 <SelectTrigger className='w-full'>

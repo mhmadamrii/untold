@@ -4,9 +4,9 @@ import type { StoryStatus } from '@untold/db/enums';
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import Link from 'next/link';
-
 import type { authClient } from '@/lib/auth-client';
 import { dummyStories, formatRelativeDate } from '@/lib/dummies';
+import { firstName } from '@/utils/fn';
 
 const STATUS_LABEL: Record<StoryStatus, string> = {
   DRAFT: 'Draft',
@@ -14,11 +14,7 @@ const STATUS_LABEL: Record<StoryStatus, string> = {
   COMPLETED: 'Completed',
 };
 
-function firstName(name: string) {
-  return name.split(' ')[0];
-}
-
-export default function Dashboard({
+export function Dashboard({
   session,
 }: {
   session: typeof authClient.$Infer.Session;

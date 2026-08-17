@@ -1,8 +1,7 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { authClient } from '@/lib/auth-client';
-
-import Dashboard from './dashboard';
+import { Dashboard } from '../_components/dashboard';
 
 export default async function DashboardPage() {
   const session = await authClient.getSession({
