@@ -125,6 +125,7 @@
 
 @utility cn-font-reading {
   font-family: var(--font-reading);
+  line-height: 1.7;
 }
 
 @layer base {

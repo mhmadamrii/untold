@@ -1,18 +1,12 @@
 'use client';
 
-import type { StoryStatus } from '@untold/db/enums';
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import Link from 'next/link';
 import type { authClient } from '@/lib/auth-client';
 import { dummyStories, formatRelativeDate } from '@/lib/dummies';
+import { STORY_STATUS_LABEL } from '@/lib/story-labels';
 import { firstName } from '@/utils/fn';
-
-const STATUS_LABEL: Record<StoryStatus, string> = {
-  DRAFT: 'Draft',
-  IN_PROGRESS: 'In progress',
-  COMPLETED: 'Completed',
-};
 
 export function Dashboard({
   session,
@@ -66,7 +60,7 @@ export function Dashboard({
                   {story.title}
                 </p>
                 <p className='mt-1 text-sm text-muted-foreground'>
-                  {STATUS_LABEL[story.status]} · {story.chapterCount}{' '}
+                  {STORY_STATUS_LABEL[story.status]} · {story.chapterCount}{' '}
                   {story.chapterCount === 1 ? 'chapter' : 'chapters'} · Edited{' '}
                   {formatRelativeDate(story.updatedAt)}
                 </p>

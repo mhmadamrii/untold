@@ -53,7 +53,7 @@ export default function StoryReaderPage({
       </p>
       <h1 className='cn-font-heading mt-2 text-4xl italic'>{data.title}</h1>
       {data.description && (
-        <p className='cn-font-reading mt-4 text-lg text-muted-foreground'>
+        <p className='cn-font-reading mt-4 text-xl text-muted-foreground'>
           {data.description}
         </p>
       )}
@@ -73,7 +73,7 @@ export default function StoryReaderPage({
                 <p className='cn-font-heading text-xl italic'>
                   {chapter.title}
                 </p>
-                <p className='cn-font-reading mt-4 whitespace-pre-line text-base leading-relaxed'>
+                <p className='cn-font-reading mt-4 whitespace-pre-line text-lg md:text-xl'>
                   {chapter.content}
                 </p>
               </div>
@@ -91,7 +91,7 @@ export default function StoryReaderPage({
           return (
             <div key={chapter.id} className='relative'>
               <p className='cn-font-heading text-xl italic'>{chapter.title}</p>
-              <p className='cn-font-reading mt-4 max-h-40 overflow-hidden text-base leading-relaxed blur-[3px] select-none'>
+              <p className='cn-font-reading mt-4 max-h-40 overflow-hidden text-lg blur-[3px] select-none md:text-xl'>
                 {chapter.preview}
                 {chapter.preview && chapter.preview.length > 0 ? '…' : ''}
               </p>

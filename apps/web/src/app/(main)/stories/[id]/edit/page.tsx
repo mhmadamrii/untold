@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { StoryStatus, Visibility } from '@untold/db/enums';
+import { StoryStatus, StoryType, Visibility } from '@untold/db/enums';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +38,11 @@ import { useRouter } from 'next/navigation';
 import { use, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+import {
+  STORY_STATUS_LABEL,
+  STORY_TYPE_LABEL,
+  VISIBILITY_LABEL,
+} from '@/lib/story-labels';
 import { orpc } from '@/utils/orpc';
 
 const TOPICS = [
@@ -55,18 +60,6 @@ const TOPICS = [
   'Fear',
   'Life Changes',
 ] as const;
-
-const STATUS_LABEL: Record<StoryStatus, string> = {
-  DRAFT: 'Draft',
-  IN_PROGRESS: 'In progress',
-  COMPLETED: 'Completed',
-};
-
-const VISIBILITY_LABEL: Record<Visibility, string> = {
-  PRIVATE: 'Private',
-  LINK: 'Anyone with the link',
-  PUBLIC: 'Public',
-};
 
 export default function StoryWorkspacePage({
   params,
@@ -176,7 +169,7 @@ export default function StoryWorkspacePage({
   const data = story.data;
 
   return (
-    <div className='mx-auto max-w-6xl px-6 py-10 border border-blue-500'>
+    <div className='mx-auto max-w-6xl px-6 py-10'>
       <div className='flex flex-wrap items-center gap-3 border-b border-border pb-6'>
         <Button
           variant='outline'
@@ -207,17 +200,6 @@ export default function StoryWorkspacePage({
           </SelectContent>
         </Select>
 
-        <Button
-          variant='outline'
-          size='sm'
-          disabled={createSynopsis.isPending}
-          onClick={() => createSynopsis.mutate({ storyId: id })}
-        >
-          {createSynopsis.isPending
-            ? 'Creating synopsis...'
-            : 'Create synopsis'}
-        </Button>
-
         <Select
           value={data.status}
           onValueChange={(value) =>
@@ -230,23 +212,15 @@ export default function StoryWorkspacePage({
           <SelectContent>
             {Object.values(StoryStatus).map((value) => (
               <SelectItem key={value} value={value}>
-                {STATUS_LABEL[value]}
+                {STORY_STATUS_LABEL[value]}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <Button
-          size='sm'
-          className='ml-auto'
-          onClick={() => toast.success('Your story is live.')}
-        >
-          Post
-        </Button>
-
         <AlertDialog>
           <AlertDialogTrigger
-            render={<Button variant='destructive' size='sm' />}
+            render={<Button variant='destructive' size='sm' className='ml-auto' />}
           >
             <TrashIcon data-icon='inline-start' />
             Delete
@@ -351,6 +325,32 @@ export default function StoryWorkspacePage({
           <div className='border-t border-border pt-6 space-y-6'>
             <div className='space-y-2'>
               <p className='text-xs font-medium tracking-wide text-muted-foreground'>
+                Story type
+              </p>
+              <Select
+                value={data.storyType ?? ''}
+                onValueChange={(value) =>
+                  updateStory.mutate({
+                    id,
+                    storyType: (value || undefined) as StoryType | undefined,
+                  })
+                }
+              >
+                <SelectTrigger className='w-full'>
+                  <SelectValue placeholder='Select a type' />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(StoryType).map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {STORY_TYPE_LABEL[value]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='space-y-2'>
+              <p className='text-xs font-medium tracking-wide text-muted-foreground'>
                 Topic
               </p>
               <Select
@@ -419,12 +419,13 @@ export default function StoryWorkspacePage({
           <div className='flex items-center gap-3 border-t border-border pt-6'>
             <Button
               variant='outline'
+              disabled={!generateDraft.data}
               onClick={() => {
                 generateDraft.reset();
                 toast('Cleared the last generated draft.');
               }}
             >
-              Reset
+              Clear draft
             </Button>
             <Button
               className='flex-1'
@@ -459,7 +460,7 @@ export default function StoryWorkspacePage({
 
             <div className='mt-6 min-h-40'>
               {generateDraft.data?.draft ? (
-                <p className='animate-in fade-in slide-in-from-bottom-2 cn-font-reading text-base leading-relaxed duration-500'>
+                <p className='animate-in fade-in slide-in-from-bottom-2 cn-font-reading text-lg duration-500'>
                   {generateDraft.data.draft}
                 </p>
               ) : (
@@ -489,12 +490,26 @@ export default function StoryWorkspacePage({
           </Button>
 
           <div className='ring-1 ring-border p-6'>
-            <p className='cn-font-heading text-lg italic'>Synopsis</p>
+            <div className='flex items-center justify-between gap-4'>
+              <p className='cn-font-heading text-lg italic'>Synopsis</p>
+              <Button
+                variant='outline'
+                size='sm'
+                disabled={createSynopsis.isPending}
+                onClick={() => createSynopsis.mutate({ storyId: id })}
+              >
+                {createSynopsis.isPending
+                  ? 'Writing...'
+                  : data.description
+                    ? 'Regenerate'
+                    : 'Create synopsis'}
+              </Button>
+            </div>
             <p className='mt-3 text-sm text-muted-foreground'>
               {data.description ??
                 (createSynopsis.isPending
                   ? 'Writing a synopsis...'
-                  : 'Click "Create synopsis" above to generate one.')}
+                  : 'Nothing yet — generate one from your notes.')}
             </p>
           </div>
         </div>

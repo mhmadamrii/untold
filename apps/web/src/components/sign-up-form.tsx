@@ -56,8 +56,11 @@ export default function SignUpForm({
   }
 
   return (
-    <div className='mx-auto w-full mt-10 max-w-md p-6'>
-      <h1 className='mb-6 text-center text-3xl font-bold'>Create Account</h1>
+    <div className='mx-auto w-full max-w-sm'>
+      <h1 className='cn-font-heading text-3xl italic'>Start your story</h1>
+      <p className='mt-2 text-sm text-muted-foreground'>
+        Create an account to begin.
+      </p>
 
       <form
         onSubmit={(e) => {
@@ -65,7 +68,7 @@ export default function SignUpForm({
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className='space-y-4'
+        className='mt-8 space-y-4'
       >
         <div>
           <form.Field name='name'>
@@ -80,7 +83,7 @@ export default function SignUpForm({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className='text-red-500'>
+                  <p key={error?.message} className='text-sm text-destructive'>
                     {error?.message}
                   </p>
                 ))}
@@ -103,7 +106,7 @@ export default function SignUpForm({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className='text-red-500'>
+                  <p key={error?.message} className='text-sm text-destructive'>
                     {error?.message}
                   </p>
                 ))}
@@ -126,7 +129,7 @@ export default function SignUpForm({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className='text-red-500'>
+                  <p key={error?.message} className='text-sm text-destructive'>
                     {error?.message}
                   </p>
                 ))}
@@ -153,13 +156,9 @@ export default function SignUpForm({
         </form.Subscribe>
       </form>
 
-      <div className='mt-4 text-center'>
-        <Button
-          variant='link'
-          onClick={onSwitchToSignIn}
-          className='text-indigo-600 hover:text-indigo-800'
-        >
-          Already have an account? Sign In
+      <div className='mt-6'>
+        <Button variant='link' onClick={onSwitchToSignIn} className='px-0'>
+          Already writing? Sign in
         </Button>
       </div>
     </div>

@@ -6,8 +6,11 @@
   STORY: a writer with an unfinished memory or idea sees Untold turn rough
     notes into a real chapter, sees AI propose (not decide) where it could go,
     and leaves knowing their story stays private until they say otherwise.
-  FIRST VIEWPORT: headline + subhead on the left rail, a two-panel "notes →
-    chapter" demonstration is the dominant visual, primary CTA below it.
+  FIRST VIEWPORT: headline + subhead on the left rail, primary CTA below it;
+    a hand-drawn illustration (writer at a desk, ink dissolving into a
+    remembered house and tree) is the dominant visual on the right. The
+    "notes → chapter" demonstration moved to its own section just below,
+    so it stays as proof without crowding the hero.
   FORM: editorial/literary, own-world build (no dice roll — CLAUDE.md is
     itself a fully pinned brief for this product).
   FINISH: unreviewed and undocumented is unfinished; this build ends with the
@@ -16,6 +19,7 @@
 */
 
 import { Button } from '@untold/ui/components/button';
+import Image from 'next/image';
 import Link from 'next/link';
 import { PopularStories } from '@/components/popular-stories';
 
@@ -50,7 +54,35 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className='animate-in fade-in slide-in-from-bottom-4 grid gap-px overflow-hidden bg-border ring-1 ring-border duration-700 sm:grid-cols-2'>
+        <Image
+          src='/illustration.jpeg'
+          alt='A hand-drawn illustration of a writer at a desk, the ink from their pen dissolving into a sketched memory of a house behind an old tree.'
+          width={1200}
+          height={896}
+          priority
+          className='h-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700'
+          style={{
+            maskImage:
+              'radial-gradient(ellipse 72% 78% at center, black 68%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse 72% 78% at center, black 68%, transparent 100%)',
+          }}
+        />
+      </section>
+
+      <div className='mx-auto h-px max-w-6xl bg-border' />
+
+      {/* Notes to chapter demo */}
+      <section className='mx-auto max-w-6xl py-20 md:py-28'>
+        <h2 className='cn-font-heading text-3xl italic'>
+          From a memory to a chapter
+        </h2>
+        <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
+          Untold turns rough, unfinished notes into a real opening, staying
+          true to what you actually remember.
+        </p>
+
+        <div className='mt-10 grid gap-px overflow-hidden bg-border ring-1 ring-border sm:grid-cols-2'>
           <div className='bg-secondary p-6'>
             <p className='text-xs font-medium tracking-wide text-muted-foreground'>
               Your notes
@@ -72,7 +104,7 @@ export default function LandingPage() {
             <p className='cn-font-heading mt-2 text-lg italic'>
               The House Behind the Hill
             </p>
-            <p className='cn-font-reading mt-4 text-sm leading-relaxed'>
+            <p className='cn-font-reading mt-4 text-base'>
               Every summer, my grandfather's house smelled like cut grass and
               diesel from the mower he refused to replace. The tree behind it
               had been there longer than any of us — taller than the roof, wider
@@ -162,7 +194,7 @@ export default function LandingPage() {
             <p className='text-xs font-medium tracking-wide text-muted-foreground'>
               Chapter Four
             </p>
-            <p className='cn-font-reading mt-4 text-sm leading-relaxed'>
+            <p className='cn-font-reading mt-4 text-base'>
               She never mentioned the letter again, but I kept it folded in the
               same drawer where I found it, and every summer after that felt a
               little different.

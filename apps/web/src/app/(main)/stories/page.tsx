@@ -1,26 +1,14 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { StoryStatus, Visibility } from '@untold/db/enums';
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import { Skeleton } from '@untold/ui/components/skeleton';
 import Link from 'next/link';
 
 import { formatRelativeDate } from '@/lib/dummies';
+import { STORY_STATUS_LABEL, VISIBILITY_LABEL } from '@/lib/story-labels';
 import { orpc } from '@/utils/orpc';
-
-const STATUS_LABEL: Record<StoryStatus, string> = {
-  DRAFT: 'Draft',
-  IN_PROGRESS: 'In progress',
-  COMPLETED: 'Completed',
-};
-
-const VISIBILITY_LABEL: Record<Visibility, string> = {
-  PRIVATE: 'Private',
-  LINK: 'Link only',
-  PUBLIC: 'Public',
-};
 
 export default function StoriesPage() {
   const stories = useQuery(orpc.story.list.queryOptions());
@@ -90,7 +78,7 @@ export default function StoriesPage() {
                     {story.title.charAt(0).toUpperCase()}
                   </span>
                   <Badge variant='outline' className='shrink-0'>
-                    {STATUS_LABEL[story.status]}
+                    {STORY_STATUS_LABEL[story.status]}
                   </Badge>
                 </div>
                 <p className='cn-font-heading mt-4 text-lg italic group-hover:text-primary'>

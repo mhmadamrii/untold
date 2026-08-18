@@ -53,8 +53,11 @@ export default function SignInForm({
   }
 
   return (
-    <div className='mx-auto w-full mt-10 max-w-md p-6'>
-      <h1 className='mb-6 text-center text-3xl font-bold'>Welcome Back</h1>
+    <div className='mx-auto w-full max-w-sm'>
+      <h1 className='cn-font-heading text-3xl italic'>Welcome back</h1>
+      <p className='mt-2 text-sm text-muted-foreground'>
+        Sign in to keep writing.
+      </p>
 
       <form
         onSubmit={(e) => {
@@ -62,7 +65,7 @@ export default function SignInForm({
           e.stopPropagation();
           form.handleSubmit();
         }}
-        className='space-y-4'
+        className='mt-8 space-y-4'
       >
         <div>
           <form.Field name='email'>
@@ -78,7 +81,7 @@ export default function SignInForm({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className='text-red-500'>
+                  <p key={error?.message} className='text-sm text-destructive'>
                     {error?.message}
                   </p>
                 ))}
@@ -101,7 +104,7 @@ export default function SignInForm({
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
                 {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className='text-red-500'>
+                  <p key={error?.message} className='text-sm text-destructive'>
                     {error?.message}
                   </p>
                 ))}
@@ -128,13 +131,9 @@ export default function SignInForm({
         </form.Subscribe>
       </form>
 
-      <div className='mt-4 text-center'>
-        <Button
-          variant='link'
-          onClick={onSwitchToSignUp}
-          className='text-indigo-600 hover:text-indigo-800'
-        >
-          Need an account? Sign Up
+      <div className='mt-6'>
+        <Button variant='link' onClick={onSwitchToSignUp} className='px-0'>
+          New here? Start your story
         </Button>
       </div>
     </div>

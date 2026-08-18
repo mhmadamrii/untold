@@ -7,24 +7,8 @@ import { Skeleton } from '@untold/ui/components/skeleton';
 import { HeartIcon, MessageCircleIcon } from 'lucide-react';
 import Link from 'next/link';
 
+import { STORY_TYPE_LABEL } from '@/lib/story-labels';
 import { orpc } from '@/utils/orpc';
-
-const STORY_TYPE_LABEL: Record<StoryType, string> = {
-  PERSONAL: 'Personal Story',
-  MEMOIR: 'Memoir',
-  LIFE_EXPERIENCE: 'Life Experience',
-  FICTION: 'Fiction',
-  SHORT_STORY: 'Short Story',
-  NOVEL: 'Novel',
-  ROMANCE: 'Romance',
-  MYSTERY: 'Mystery',
-  FANTASY: 'Fantasy',
-  ADVENTURE: 'Adventure',
-  HORROR: 'Horror',
-  HISTORICAL: 'Historical',
-  INSPIRATIONAL: 'Inspirational',
-  CHILDRENS_STORY: "Children's Story",
-};
 
 export function DiscoverFilters({ activeType }: { activeType?: StoryType }) {
   return (
