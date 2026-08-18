@@ -1,21 +1,25 @@
 /*
-  THESIS: Prove the mechanism — notes become a chapter — before any claim is made.
-  OWN-WORLD: warm paper/ink palette, one terracotta accent, hairline rules (no
-    shadow-cards), Fraunces italic for display, Lora for reading passages,
-    Plus Jakarta Sans for UI copy.
-  STORY: a writer with an unfinished memory or idea sees Untold turn rough
-    notes into a real chapter, sees AI propose (not decide) where it could go,
-    and leaves knowing their story stays private until they say otherwise.
-  FIRST VIEWPORT: headline + subhead on the left rail, primary CTA below it;
-    a hand-drawn illustration (writer at a desk, ink dissolving into a
-    remembered house and tree) is the dominant visual on the right. The
-    "notes → chapter" demonstration moved to its own section just below,
-    so it stays as proof without crowding the hero.
-  FORM: editorial/literary, own-world build (no dice roll — CLAUDE.md is
-    itself a fully pinned brief for this product).
-  FINISH: unreviewed and undocumented is unfinished; this build ends with the
-    finish review, the verdict, DESIGN.md, and every shipping raster carrying
-    its provenance.
+ THESIS: Prove the mechanism — notes become a chapter — before any claim is made.
+ OWN-WORLD: warm paper/ink palette, one terracotta accent, hairline rules (no
+ shadow-cards), Lora for both display and reading (classical book serif,
+ upright not italic), Plus Jakarta Sans for UI copy.
+ STORY: a writer with an unfinished memory or idea sees Untold turn rough
+ notes into a real chapter, sees AI propose (not decide) where it could go,
+ and leaves knowing their story stays private until they say otherwise.
+ FIRST VIEWPORT: eyebrow + headline + subhead on the left rail, an
+ outline-accent primary CTA below it; a hand-drawn illustration (writer at
+ a desk, ink dissolving into a remembered house and tree) sits in a
+ bordered "plate" frame with a captioned figure label on the right,
+ deliberately framed rather than bled into the page. The "notes → chapter"
+ demonstration moved to its own section just below, so it stays as proof
+ without crowding the hero.
+ FORM: editorial/literary, own-world build. Direction revised per a
+ user-approved reference mockup (classical upright serif, eyebrow label,
+ outline CTA, framed plate illustration) — a pinned brief overrides the
+ skill's own default anti-eyebrow stance.
+ FINISH: unreviewed and undocumented is unfinished; this build ends with the
+ finish review, the verdict, DESIGN.md, and every shipping raster carrying
+ its provenance.
 */
 
 import { Button } from '@untold/ui/components/button';
@@ -29,7 +33,10 @@ export default function LandingPage() {
       {/* Hero */}
       <section className='mx-auto grid max-w-6xl gap-12 py-20 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-center md:py-28'>
         <div>
-          <h1 className='cn-font-heading text-4xl leading-[1.05] font-medium italic sm:text-5xl'>
+          <p className='text-xs font-medium tracking-[0.15em] text-primary uppercase'>
+            A writing companion
+          </p>
+          <h1 className='cn-font-heading mt-3 text-4xl leading-[1.05] font-medium sm:text-5xl'>
             Everyone has a story. Not everyone knows how to tell it.
           </h1>
           <p className='mt-6 max-w-md text-base text-muted-foreground'>
@@ -40,7 +47,9 @@ export default function LandingPage() {
           <div className='mt-8 flex items-center gap-5'>
             <Button
               size='lg'
+              variant='outline'
               nativeButton={false}
+              className='border-primary text-primary hover:bg-primary/10'
               render={<Link href='/login' />}
             >
               Start your story
@@ -54,32 +63,33 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <Image
-          src='/illustration.jpeg'
-          alt='A hand-drawn illustration of a writer at a desk, the ink from their pen dissolving into a sketched memory of a house behind an old tree.'
-          width={1200}
-          height={896}
-          priority
-          className='h-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700'
-          style={{
-            maskImage:
-              'radial-gradient(ellipse 72% 78% at center, black 68%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 72% 78% at center, black 68%, transparent 100%)',
-          }}
-        />
+        <figure>
+          <div className='ring-1 ring-border'>
+            <Image
+              src='/illustration.jpeg'
+              alt='A hand-drawn illustration of a writer at a desk, the ink from their pen dissolving into a sketched memory of a house behind an old tree.'
+              width={1200}
+              height={896}
+              priority
+              className='h-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700'
+            />
+          </div>
+          <figcaption className='cn-font-reading mt-3 text-sm text-muted-foreground italic'>
+            Plate I — the story before it is written down.
+          </figcaption>
+        </figure>
       </section>
 
       <div className='mx-auto h-px max-w-6xl bg-border' />
 
       {/* Notes to chapter demo */}
       <section className='mx-auto max-w-6xl py-20 md:py-28'>
-        <h2 className='cn-font-heading text-3xl italic'>
+        <h2 className='cn-font-heading text-3xl'>
           From a memory to a chapter
         </h2>
         <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
-          Untold turns rough, unfinished notes into a real opening, staying
-          true to what you actually remember.
+          Untold turns rough, unfinished notes into a real opening, staying true
+          to what you actually remember.
         </p>
 
         <div className='mt-10 grid gap-px overflow-hidden bg-border ring-1 ring-border sm:grid-cols-2'>
@@ -101,7 +111,7 @@ export default function LandingPage() {
             <p className='text-xs font-medium tracking-wide text-muted-foreground'>
               Chapter One
             </p>
-            <p className='cn-font-heading mt-2 text-lg italic'>
+            <p className='cn-font-heading mt-2 text-lg'>
               The House Behind the Hill
             </p>
             <p className='cn-font-reading mt-4 text-base'>
@@ -125,7 +135,7 @@ export default function LandingPage() {
       <section className='mx-auto max-w-6xl py-20 md:py-28'>
         <div className='grid gap-10 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]'>
           <div>
-            <h2 className='cn-font-heading text-3xl italic'>
+            <h2 className='cn-font-heading text-3xl'>
               Untold proposes. You decide.
             </h2>
             <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
@@ -154,7 +164,7 @@ export default function LandingPage() {
               },
             ].map((direction) => (
               <div key={direction.letter} className='flex gap-5 py-6'>
-                <span className='cn-font-heading text-2xl text-primary italic'>
+                <span className='cn-font-heading text-2xl text-primary'>
                   {direction.letter}
                 </span>
                 <div>
@@ -173,7 +183,7 @@ export default function LandingPage() {
 
       {/* Popular stories */}
       <section className='mx-auto max-w-6xl py-20 md:py-28'>
-        <h2 className='cn-font-heading text-3xl italic'>
+        <h2 className='cn-font-heading text-3xl'>
           Stories people are reading.
         </h2>
         <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
@@ -199,7 +209,7 @@ export default function LandingPage() {
               same drawer where I found it, and every summer after that felt a
               little different.
             </p>
-            <p className='cn-font-heading mt-6 text-lg italic'>
+            <p className='cn-font-heading mt-6 text-lg'>
               To be continued&hellip;
             </p>
             <Button variant='outline' className='mt-4'>
@@ -207,7 +217,7 @@ export default function LandingPage() {
             </Button>
           </div>
           <div className='order-1 md:order-2'>
-            <h2 className='cn-font-heading text-3xl italic'>
+            <h2 className='cn-font-heading text-3xl'>
               Your story keeps growing.
             </h2>
             <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
@@ -223,7 +233,7 @@ export default function LandingPage() {
 
       {/* Closing */}
       <section className='mx-auto max-w-6xl py-20 text-center md:py-28'>
-        <h2 className='cn-font-heading mx-auto max-w-2xl text-3xl italic sm:text-4xl'>
+        <h2 className='cn-font-heading mx-auto max-w-2xl text-3xl sm:text-4xl'>
           Private, until you decide otherwise.
         </h2>
         <p className='mx-auto mt-4 max-w-md text-sm text-muted-foreground'>
@@ -233,7 +243,9 @@ export default function LandingPage() {
         <div className='mt-8 flex justify-center'>
           <Button
             size='lg'
+            variant='outline'
             nativeButton={false}
+            className='border-primary text-primary hover:bg-primary/10'
             render={<Link href='/login' />}
           >
             Start your story

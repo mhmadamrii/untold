@@ -33,7 +33,7 @@ export default function NewStoryPage() {
 
   return (
     <div className='mx-auto max-w-2xl px-6 py-24 text-center'>
-      <p className='cn-font-heading text-2xl italic'>
+      <p className='cn-font-heading text-2xl'>
         {createStory.isError
           ? 'Something went wrong starting your story.'
           : 'Starting your story...'}

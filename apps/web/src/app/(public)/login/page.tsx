@@ -27,7 +27,7 @@ export default function LoginPage() {
           height={610}
           className='h-auto w-full max-w-xs'
         />
-        <p className='cn-font-heading text-lg text-muted-foreground italic'>
+        <p className='cn-font-heading text-lg text-muted-foreground'>
           Everyone has a story.
         </p>
       </div>

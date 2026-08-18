@@ -17,7 +17,7 @@ export default function StoriesPage() {
     <div className='mx-auto max-w-6xl px-6 py-16'>
       <div className='flex flex-wrap items-end justify-between gap-6 border-b border-border pb-8'>
         <div>
-          <h1 className='cn-font-heading text-3xl italic'>Your stories</h1>
+          <h1 className='cn-font-heading text-3xl'>Your stories</h1>
           <p className='mt-2 text-sm text-muted-foreground'>
             {stories.data
               ? `${stories.data.length} ${stories.data.length === 1 ? 'story' : 'stories'}`
@@ -47,7 +47,7 @@ export default function StoriesPage() {
 
       {stories.data && stories.data.length === 0 && (
         <div className='mx-auto max-w-md py-24 text-center'>
-          <p className='cn-font-heading text-2xl italic'>
+          <p className='cn-font-heading text-2xl'>
             Your next story hasn&rsquo;t been written yet.
           </p>
           <p className='mt-3 text-sm text-muted-foreground'>
@@ -74,14 +74,14 @@ export default function StoriesPage() {
             >
               <div>
                 <div className='flex items-start justify-between gap-3'>
-                  <span className='cn-font-heading text-2xl text-primary italic'>
+                  <span className='cn-font-heading text-2xl text-primary'>
                     {story.title.charAt(0).toUpperCase()}
                   </span>
                   <Badge variant='outline' className='shrink-0'>
                     {STORY_STATUS_LABEL[story.status]}
                   </Badge>
                 </div>
-                <p className='cn-font-heading mt-4 text-lg italic group-hover:text-primary'>
+                <p className='cn-font-heading mt-4 text-lg group-hover:text-primary'>
                   {story.title}
                 </p>
                 {story.description && (

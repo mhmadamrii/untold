@@ -1,15 +1,9 @@
 import type { Metadata } from 'next';
-import { Fraunces, Lora, Plus_Jakarta_Sans } from 'next/font/google';
+import { Lora, Plus_Jakarta_Sans } from 'next/font/google';
 
 import '../index.css';
 import Header from '@/components/header';
 import Providers from '@/components/providers';
-
-const fraunces = Fraunces({
-  variable: '--font-fraunces',
-  subsets: ['latin'],
-  style: ['normal', 'italic'],
-});
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: '--font-jakarta',
@@ -36,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${fraunces.variable} ${plusJakartaSans.variable} ${lora.variable} antialiased`}
+        className={`${plusJakartaSans.variable} ${lora.variable} antialiased`}
       >
         <Providers>
           <div className='flex min-h-svh flex-col'>

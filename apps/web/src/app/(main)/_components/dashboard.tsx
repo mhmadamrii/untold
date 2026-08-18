@@ -20,7 +20,7 @@ export function Dashboard({
 
   return (
     <div className='mx-auto max-w-4xl px-6 py-16'>
-      <h1 className='cn-font-heading text-3xl italic'>
+      <h1 className='cn-font-heading text-3xl'>
         Good morning, {firstName(session.user.name)}.
       </h1>
       <p className='mt-3 text-muted-foreground'>
@@ -46,7 +46,7 @@ export function Dashboard({
       </div>
 
       <div className='mt-16'>
-        <h2 className='cn-font-heading text-xl italic'>Your stories</h2>
+        <h2 className='cn-font-heading text-xl'>Your stories</h2>
 
         <div className='mt-6 divide-y divide-border border-y border-border'>
           {stories.map((story) => (
@@ -56,7 +56,7 @@ export function Dashboard({
               className='group flex items-center justify-between gap-6 py-5'
             >
               <div>
-                <p className='cn-font-heading text-lg italic group-hover:text-primary'>
+                <p className='cn-font-heading text-lg group-hover:text-primary'>
                   {story.title}
                 </p>
                 <p className='mt-1 text-sm text-muted-foreground'>

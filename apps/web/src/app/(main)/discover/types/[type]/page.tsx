@@ -19,7 +19,7 @@ export default async function DiscoverByTypePage({
   return (
     <div className='mx-auto max-w-6xl px-6 py-16'>
       <div className='border-b border-border pb-8'>
-        <h1 className='cn-font-heading text-3xl italic'>Discover</h1>
+        <h1 className='cn-font-heading text-3xl'>Discover</h1>
         <p className='mt-2 text-sm text-muted-foreground'>
           Stories other writers have chosen to share publicly.
         </p>

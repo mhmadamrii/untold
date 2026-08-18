@@ -49,7 +49,7 @@ export function DiscoverGrid({ storyType }: { storyType?: StoryType }) {
   if (!stories.data || stories.data.length === 0) {
     return (
       <div className='mx-auto max-w-md py-24 text-center'>
-        <p className='cn-font-heading text-2xl italic'>Nothing here yet.</p>
+        <p className='cn-font-heading text-2xl'>Nothing here yet.</p>
         <p className='mt-3 text-sm text-muted-foreground'>
           {storyType
             ? 'No public stories of this type yet — try another, or check back later.'
@@ -68,7 +68,7 @@ export function DiscoverGrid({ storyType }: { storyType?: StoryType }) {
           className='group flex flex-col justify-between gap-6 bg-card p-6 transition-colors hover:bg-secondary'
         >
           <div>
-            <p className='cn-font-heading text-lg italic group-hover:text-primary'>
+            <p className='cn-font-heading text-lg group-hover:text-primary'>
               {story.title}
             </p>
             {story.description && (

@@ -15,10 +15,7 @@ export default function Header() {
   return (
     <header className='border-b border-border'>
       <div className='mx-auto flex max-w-6xl items-center justify-between px-6 py-4'>
-        <Link
-          href='/'
-          className='cn-font-heading text-xl italic tracking-tight'
-        >
+        <Link href='/' className='cn-font-heading text-xl tracking-tight'>
           Untold
         </Link>
         <div className='flex items-center gap-6'>

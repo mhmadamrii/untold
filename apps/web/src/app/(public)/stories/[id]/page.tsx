@@ -32,7 +32,7 @@ export default function StoryReaderPage({
   if (!story.data) {
     return (
       <div className='mx-auto max-w-3xl px-6 py-20 text-center'>
-        <p className='cn-font-heading text-2xl italic'>Story not found.</p>
+        <p className='cn-font-heading text-2xl'>Story not found.</p>
         <Link
           href='/'
           className='mt-4 inline-block text-sm text-primary hover:underline'
@@ -51,7 +51,7 @@ export default function StoryReaderPage({
       <p className='text-xs font-medium tracking-wide text-muted-foreground'>
         by {data.author.name}
       </p>
-      <h1 className='cn-font-heading mt-2 text-4xl italic'>{data.title}</h1>
+      <h1 className='cn-font-heading mt-2 text-4xl'>{data.title}</h1>
       {data.description && (
         <p className='cn-font-reading mt-4 text-xl text-muted-foreground'>
           {data.description}
@@ -70,9 +70,7 @@ export default function StoryReaderPage({
           if (!chapter.locked) {
             return (
               <div key={chapter.id}>
-                <p className='cn-font-heading text-xl italic'>
-                  {chapter.title}
-                </p>
+                <p className='cn-font-heading text-xl'>{chapter.title}</p>
                 <p className='cn-font-reading mt-4 whitespace-pre-line text-lg md:text-xl'>
                   {chapter.content}
                 </p>
@@ -90,7 +88,7 @@ export default function StoryReaderPage({
 
           return (
             <div key={chapter.id} className='relative'>
-              <p className='cn-font-heading text-xl italic'>{chapter.title}</p>
+              <p className='cn-font-heading text-xl'>{chapter.title}</p>
               <p className='cn-font-reading mt-4 max-h-40 overflow-hidden text-lg blur-[3px] select-none md:text-xl'>
                 {chapter.preview}
                 {chapter.preview && chapter.preview.length > 0 ? '…' : ''}

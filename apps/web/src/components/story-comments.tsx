@@ -36,7 +36,7 @@ export function StoryComments({ storyId }: { storyId: string }) {
 
   return (
     <div>
-      <h2 className='cn-font-heading text-2xl italic'>Comments</h2>
+      <h2 className='cn-font-heading text-2xl'>Comments</h2>
 
       {session ? (
         <form

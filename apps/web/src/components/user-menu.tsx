@@ -24,8 +24,11 @@ export default function UserMenu() {
 
   if (!session) {
     return (
-      <Link href='/login'>
-        <Button variant='outline'>Sign In</Button>
+      <Link
+        href='/login'
+        className='text-sm font-medium text-primary hover:underline'
+      >
+        Sign In
       </Link>
     );
   }

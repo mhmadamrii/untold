@@ -161,7 +161,7 @@ export default function StoryWorkspacePage({
   if (!story.data) {
     return (
       <div className='mx-auto max-w-6xl px-6 py-20 text-center'>
-        <p className='cn-font-heading text-2xl italic'>Story not found.</p>
+        <p className='cn-font-heading text-2xl'>Story not found.</p>
       </div>
     );
   }
@@ -220,7 +220,9 @@ export default function StoryWorkspacePage({
 
         <AlertDialog>
           <AlertDialogTrigger
-            render={<Button variant='destructive' size='sm' className='ml-auto' />}
+            render={
+              <Button variant='destructive' size='sm' className='ml-auto' />
+            }
           >
             <TrashIcon data-icon='inline-start' />
             Delete
@@ -455,7 +457,7 @@ export default function StoryWorkspacePage({
                   updateStory.mutate({ id, title: title.trim() });
                 }
               }}
-              className='cn-font-heading border-0 px-0 text-2xl italic focus-visible:ring-0'
+              className='cn-font-heading border-0 px-0 text-2xl focus-visible:ring-0'
             />
 
             <div className='mt-6 min-h-40'>
@@ -491,7 +493,7 @@ export default function StoryWorkspacePage({
 
           <div className='ring-1 ring-border p-6'>
             <div className='flex items-center justify-between gap-4'>
-              <p className='cn-font-heading text-lg italic'>Synopsis</p>
+              <p className='cn-font-heading text-lg'>Synopsis</p>
               <Button
                 variant='outline'
                 size='sm'

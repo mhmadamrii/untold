@@ -5,7 +5,7 @@ export default function SharedPage() {
   return (
     <div className='mx-auto max-w-6xl px-6 py-16'>
       <div className='border-b border-border pb-8'>
-        <h1 className='cn-font-heading text-3xl italic'>Shared with you</h1>
+        <h1 className='cn-font-heading text-3xl'>Shared with you</h1>
         <p className='mt-2 text-sm text-muted-foreground'>
           Stories other writers share with you privately.
         </p>
@@ -15,7 +15,7 @@ export default function SharedPage() {
         <div className='mx-auto flex size-12 items-center justify-center ring-1 ring-border'>
           <Share2Icon className='size-5 text-muted-foreground' />
         </div>
-        <p className='cn-font-heading mt-6 text-2xl italic'>
+        <p className='cn-font-heading mt-6 text-2xl'>
           Nothing shared with you yet.
         </p>
         <p className='mt-3 text-sm text-muted-foreground'>

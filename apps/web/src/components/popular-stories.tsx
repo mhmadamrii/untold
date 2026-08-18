@@ -43,7 +43,7 @@ export function PopularStories() {
           className='group flex flex-col justify-between bg-card p-6 transition-colors hover:bg-secondary'
         >
           <div>
-            <p className='cn-font-heading text-lg italic group-hover:text-primary'>
+            <p className='cn-font-heading text-lg group-hover:text-primary'>
               {story.title}
             </p>
             {story.description && (
