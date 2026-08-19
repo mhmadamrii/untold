@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { ModeToggle } from './mode-toggle';
@@ -15,7 +16,11 @@ export default function Header() {
   return (
     <header className='border-b border-border'>
       <div className='mx-auto flex max-w-6xl items-center justify-between px-6 py-4'>
-        <Link href='/' className='cn-font-heading text-xl tracking-tight'>
+        <Link
+          href='/'
+          className='flex items-center gap-2 cn-font-heading text-xl tracking-tight'
+        >
+          <Image src='/logo.png' alt='' width={28} height={28} />
           Untold
         </Link>
         <div className='flex items-center gap-6'>

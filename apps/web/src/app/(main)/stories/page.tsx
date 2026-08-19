@@ -6,7 +6,7 @@ import { Button } from '@untold/ui/components/button';
 import { Skeleton } from '@untold/ui/components/skeleton';
 import Link from 'next/link';
 
-import { formatRelativeDate } from '@/lib/dummies';
+import { formatRelativeDate } from '@/lib/format-date';
 import { STORY_STATUS_LABEL, VISIBILITY_LABEL } from '@/lib/story-labels';
 import { orpc } from '@/utils/orpc';
 
