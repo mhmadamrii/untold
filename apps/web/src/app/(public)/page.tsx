@@ -1,258 +1,157 @@
-/*
- THESIS: Prove the mechanism — notes become a chapter — before any claim is made.
- OWN-WORLD: warm paper/ink palette, one terracotta accent, hairline rules (no
- shadow-cards), Lora for both display and reading (classical book serif,
- upright not italic), Plus Jakarta Sans for UI copy.
- STORY: a writer with an unfinished memory or idea sees Untold turn rough
- notes into a real chapter, sees AI propose (not decide) where it could go,
- and leaves knowing their story stays private until they say otherwise.
- FIRST VIEWPORT: eyebrow + headline + subhead on the left rail, an
- outline-accent primary CTA below it; a hand-drawn illustration (writer at
- a desk, ink dissolving into a remembered house and tree) sits in a
- bordered "plate" frame with a captioned figure label on the right,
- deliberately framed rather than bled into the page. The "notes → chapter"
- demonstration moved to its own section just below, so it stays as proof
- without crowding the hero.
- FORM: editorial/literary, own-world build. Direction revised per a
- user-approved reference mockup (classical upright serif, eyebrow label,
- outline CTA, framed plate illustration) — a pinned brief overrides the
- skill's own default anti-eyebrow stance.
- FINISH: unreviewed and undocumented is unfinished; this build ends with the
- finish review, the verdict, DESIGN.md, and every shipping raster carrying
- its provenance.
-*/
-
 import { Button } from '@untold/ui/components/button';
-import Image from 'next/image';
 import Link from 'next/link';
 import { PopularStories } from '@/components/popular-stories';
 
 export default function LandingPage() {
   return (
     <div className='px-6'>
-      {/* Hero */}
-      <section className='mx-auto grid max-w-6xl gap-12 py-20 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:items-center md:py-28'>
+      <section className='mx-auto grid max-w-6xl gap-12 py-20 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:py-28'>
         <div>
-          <p className='text-xs font-medium tracking-[0.15em] text-primary uppercase'>
-            A writing companion
+          <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+            A home for the stories people carry
           </p>
-          <h1 className='cn-font-heading mt-3 text-4xl leading-[1.05] font-medium sm:text-5xl'>
-            Everyone has a story. Not everyone knows how to tell it.
+          <h1 className='cn-font-heading mt-3 text-4xl leading-[1.05] font-semibold sm:text-5xl'>
+            Everyone has an untold story.
           </h1>
           <p className='mt-6 max-w-md text-base text-muted-foreground'>
-            Untold helps you find the story inside your memories, ideas, and
-            unfinished thoughts — then helps you write it. You stay the author.
-            Untold is the companion, never the ghostwriter.
+            Read memoirs, family histories and fiction written by people who
+            finally sat down and told it. Then, if you have one of your own,
+            Untold helps you shape a pile of notes and half-memories into
+            chapters someone can read.
           </p>
-          <div className='mt-8 flex items-center gap-5'>
+          <div className='mt-8 flex flex-wrap items-center gap-4'>
+            <Button size='lg' nativeButton={false} render={<Link href='/discover' />}>
+              Read stories
+            </Button>
             <Button
               size='lg'
               variant='outline'
               nativeButton={false}
-              className='border-primary text-primary hover:bg-primary/10'
               render={<Link href='/login' />}
             >
-              Start your story
+              Write your own story
             </Button>
-            <Link
-              href='/login'
-              className='text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline'
-            >
-              Already writing? Sign in
-            </Link>
           </div>
+          <p className='mt-4 text-sm text-muted-foreground'>
+            Free to read. Free to start writing.
+          </p>
         </div>
 
         <figure>
-          <div className='ring-1 ring-border'>
-            <Image
-              src='/illustration.jpeg'
-              alt='A hand-drawn illustration of a writer at a desk, the ink from their pen dissolving into a sketched memory of a house behind an old tree.'
-              width={1200}
-              height={896}
-              priority
-              className='h-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-700'
-            />
+          <div className='cn-plate aspect-[4/5] bg-secondary grid place-items-center'>
+            <span className='text-xs uppercase tracking-widest text-muted-foreground'>
+              Placeholder Image
+            </span>
           </div>
           <figcaption className='cn-font-reading mt-3 text-sm text-muted-foreground italic'>
-            Plate I — the story before it is written down.
+            A reader's desk, warm daylight.
           </figcaption>
         </figure>
       </section>
 
       <div className='mx-auto h-px max-w-6xl bg-border' />
 
-      {/* Notes to chapter demo */}
       <section className='mx-auto max-w-6xl py-20 md:py-28'>
         <h2 className='cn-font-heading text-3xl'>
-          From a memory to a chapter
+          Read first. Write when you're ready.
         </h2>
-        <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
-          Untold turns rough, unfinished notes into a real opening, staying true
-          to what you actually remember.
+        <p className='mt-4 max-w-md text-sm text-muted-foreground'>
+          You don't need a finished idea, or even a good one. Bring what you
+          have, and see what it could become before you commit to writing a
+          word of it.
         </p>
 
-        <div className='mt-10 grid gap-px overflow-hidden bg-border ring-1 ring-border sm:grid-cols-2'>
-          <div className='bg-secondary p-6'>
-            <p className='text-xs font-medium tracking-wide text-muted-foreground'>
-              Your notes
-            </p>
-            <p className='mt-4 text-sm leading-relaxed text-muted-foreground'>
-              grandpa's house every summer. old tree behind the house.
-              <br />
-              <br />
-              one summer I found something buried underneath it.
-              <br />
-              <br />
-              never told anyone. don't know why I'm thinking about it now
-            </p>
-          </div>
-          <div className='bg-card p-6'>
-            <p className='text-xs font-medium tracking-wide text-muted-foreground'>
-              Chapter One
-            </p>
-            <p className='cn-font-heading mt-2 text-lg'>
-              The House Behind the Hill
-            </p>
-            <p className='cn-font-reading mt-4 text-base'>
-              Every summer, my grandfather's house smelled like cut grass and
-              diesel from the mower he refused to replace. The tree behind it
-              had been there longer than any of us — taller than the roof, wider
-              than the porch. I was nine the summer I found what was buried
-              beneath its roots, though it would take another twenty years
-              before I understood what it meant.
-            </p>
-          </div>
-          <p className='col-span-full bg-background px-6 py-3 text-xs text-muted-foreground'>
-            Illustrative example — not a real Untold story.
-          </p>
+        <div className='mt-12 grid divide-y divide-border border-y border-border md:grid-cols-3 md:divide-x md:divide-y-0 md:border-x'>
+          {[
+            {
+              number: '01',
+              title: 'Bring the rough version',
+              body: 'A memory, a bullet list, a voice note transcript, a single sentence that has been on your mind. Nothing needs to be polished to start.',
+            },
+            {
+              number: '02',
+              title: 'See what it could become',
+              body: 'Untold reads what you have and proposes a few honest directions — it never decides for you, and it never invents facts about your life.',
+            },
+            {
+              number: '03',
+              title: 'Write it, chapter by chapter',
+              body: 'Pick a direction, write the first chapter, and come back to continue whenever the next part of the story is ready to be told.',
+            },
+          ].map((step) => (
+            <div key={step.number} className='p-8 first:pt-0 md:first:pl-0 md:last:pr-0'>
+              <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+                {step.number}
+              </p>
+              <p className='cn-font-heading mt-3 text-lg'>{step.title}</p>
+              <p className='mt-2 text-sm text-muted-foreground'>{step.body}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      <div className='mx-auto h-px max-w-6xl bg-border' />
-
-      {/* Direction */}
-      <section className='mx-auto max-w-6xl py-20 md:py-28'>
-        <div className='grid gap-10 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]'>
-          <div>
+      <div className='border-y border-border bg-secondary'>
+        <section className='mx-auto max-w-6xl px-6 py-20 md:py-28'>
+          <div className='flex flex-wrap items-end justify-between gap-4'>
             <h2 className='cn-font-heading text-3xl'>
-              Untold proposes. You decide.
+              From the library this week
             </h2>
-            <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
-              When your story could go more than one way, Untold won't pick for
-              you. It shows you what it could become, and you choose the
-              direction that feels true.
-            </p>
-          </div>
-
-          <div className='divide-y divide-border border-y border-border'>
-            {[
-              {
-                letter: 'A',
-                title: 'The Family Secret',
-                body: 'The discovery reveals something your grandfather never told anyone.',
-              },
-              {
-                letter: 'B',
-                title: 'A Childhood Adventure',
-                body: 'The discovery begins an adventure that changes how you remember your childhood.',
-              },
-              {
-                letter: 'C',
-                title: 'Keep It Real',
-                body: 'Build this around the emotions and memories you actually experienced.',
-              },
-            ].map((direction) => (
-              <div key={direction.letter} className='flex gap-5 py-6'>
-                <span className='cn-font-heading text-2xl text-primary'>
-                  {direction.letter}
-                </span>
-                <div>
-                  <p className='font-medium'>{direction.title}</p>
-                  <p className='mt-1 text-sm text-muted-foreground'>
-                    {direction.body}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <div className='mx-auto h-px max-w-6xl bg-border' />
-
-      {/* Popular stories */}
-      <section className='mx-auto max-w-6xl py-20 md:py-28'>
-        <h2 className='cn-font-heading text-3xl'>
-          Stories people are reading.
-        </h2>
-        <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
-          Shared publicly by other writers. Read freely — sign in to keep
-          reading the rest, like a story, or leave a comment.
-        </p>
-        <div className='mt-10'>
-          <PopularStories />
-        </div>
-      </section>
-
-      <div className='mx-auto h-px max-w-6xl bg-border' />
-
-      {/* Continuation */}
-      <section className='mx-auto max-w-6xl py-20 md:py-28'>
-        <div className='grid gap-10 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:items-center'>
-          <div className='order-2 bg-card p-8 ring-1 ring-border md:order-1'>
-            <p className='text-xs font-medium tracking-wide text-muted-foreground'>
-              Chapter Four
-            </p>
-            <p className='cn-font-reading mt-4 text-base'>
-              She never mentioned the letter again, but I kept it folded in the
-              same drawer where I found it, and every summer after that felt a
-              little different.
-            </p>
-            <p className='cn-font-heading mt-6 text-lg'>
-              To be continued&hellip;
-            </p>
             <Button
               variant='outline'
               nativeButton={false}
-              className='mt-4'
-              render={<Link href='/login' />}
+              render={<Link href='/discover' />}
             >
-              Continue it
+              See all stories
             </Button>
           </div>
-          <div className='order-1 md:order-2'>
-            <h2 className='cn-font-heading text-3xl'>
-              Your story keeps growing.
-            </h2>
-            <p className='mt-4 max-w-sm text-sm text-muted-foreground'>
-              Stories aren't finished in one sitting. Untold remembers what
-              happened, so when you come back — a day, a week, a season later —
-              it picks up where you left off.
+          <div className='mt-10'>
+            <PopularStories />
+          </div>
+        </section>
+      </div>
+
+      <section className='mx-auto max-w-6xl py-20 md:py-28'>
+        <div className='grid gap-12 md:grid-cols-2 md:items-center'>
+          <div className='cn-plate aspect-[4/5] bg-secondary grid place-items-center'>
+            <span className='text-xs uppercase tracking-widest text-muted-foreground'>
+              Placeholder Image
+            </span>
+          </div>
+          <div>
+            <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+              For writers
             </p>
+            <h2 className='cn-font-heading mt-3 text-3xl'>
+              You are the author. Always.
+            </h2>
+            <p className='mt-4 max-w-md text-sm text-muted-foreground'>
+              Untold never publishes on your behalf and never writes over your
+              own words. It helps you find the story inside what you already
+              remember, suggests directions, and gets you unstuck — the rest
+              stays yours. Every story stays private until you decide it's
+              ready to be shared.
+            </p>
+            <div className='mt-6'>
+              <Button nativeButton={false} render={<Link href='/login' />}>
+                Write your own story
+              </Button>
+            </div>
           </div>
         </div>
       </section>
 
       <div className='mx-auto h-px max-w-6xl bg-border' />
 
-      {/* Closing */}
       <section className='mx-auto max-w-6xl py-20 text-center md:py-28'>
         <h2 className='cn-font-heading mx-auto max-w-2xl text-3xl sm:text-4xl'>
           Private, until you decide otherwise.
         </h2>
         <p className='mx-auto mt-4 max-w-md text-sm text-muted-foreground'>
-          Every story starts private. You choose if, when, and how it's shared —
-          with one person, with a link, or with the world.
+          Every story starts private. You choose if, when, and how it's
+          shared — with one person, with a link, or with the world.
         </p>
         <div className='mt-8 flex justify-center'>
-          <Button
-            size='lg'
-            variant='outline'
-            nativeButton={false}
-            className='border-primary text-primary hover:bg-primary/10'
-            render={<Link href='/login' />}
-          >
+          <Button size='lg' nativeButton={false} render={<Link href='/login' />}>
             Start your story
           </Button>
         </div>

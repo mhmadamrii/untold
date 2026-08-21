@@ -20,13 +20,15 @@ export default function LoginPage() {
       </div>
 
       <div className='hidden flex-col items-center justify-center gap-6 border-l border-border bg-secondary px-12 py-16 md:flex'>
-        <Image
-          src='/book.png'
-          alt='A hand-drawn illustration of an open notebook with a pen resting across it, a few written lines trailing into a small sketchy flourish.'
-          width={409}
-          height={610}
-          className='h-auto w-full max-w-xs'
-        />
+        <div className='cn-plate w-full max-w-xs'>
+          <Image
+            src='/book.png'
+            alt='A hand-drawn illustration of an open notebook with a pen resting across it, a few written lines trailing into a small sketchy flourish.'
+            width={409}
+            height={610}
+            className='h-auto w-full'
+          />
+        </div>
         <p className='cn-font-heading text-lg text-muted-foreground'>
           Everyone has a story.
         </p>

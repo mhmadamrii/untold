@@ -15,10 +15,9 @@ import { ModeToggle } from './mode-toggle';
 import UserMenu from './user-menu';
 
 const navLinks = [
-  { href: '/dashboard', label: 'Home' },
-  { href: '/stories', label: 'My Stories' },
+  { href: '/dashboard', label: 'My Stories' },
   { href: '/discover', label: 'Discover' },
-  { href: '/shared', label: 'Shared' },
+  { href: '/profile', label: 'Profile' },
 ] as const;
 
 export default function Header() {
@@ -44,6 +43,14 @@ export default function Header() {
               </Link>
             ))}
           </nav>
+          <Button
+            size='sm'
+            nativeButton={false}
+            render={<Link href='/stories/new' />}
+            className='hidden sm:inline-flex'
+          >
+            New story
+          </Button>
           <ModeToggle />
           <UserMenu />
           <Sheet>

@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
-import { Lora, Plus_Jakarta_Sans } from 'next/font/google';
+import { Cormorant_Garamond, Lora } from 'next/font/google';
 
 import '../index.css';
 import Header from '@/components/header';
 import Providers from '@/components/providers';
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: '--font-jakarta',
+const cormorantGaramond = Cormorant_Garamond({
+  variable: '--font-cormorant',
   subsets: ['latin'],
+  weight: ['400', '600'],
 });
 
 const lora = Lora({
@@ -30,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${plusJakartaSans.variable} ${lora.variable} antialiased`}
+        className={`${cormorantGaramond.variable} ${lora.variable} antialiased`}
       >
         <Providers>
           <div className='flex min-h-svh flex-col'>

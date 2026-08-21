@@ -57,7 +57,10 @@ export default function SignUpForm({
 
   return (
     <div className='mx-auto w-full max-w-sm'>
-      <h1 className='cn-font-heading text-3xl'>Start your story</h1>
+      <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+        Free account
+      </p>
+      <h1 className='cn-font-heading mt-3 text-4xl'>Start your story</h1>
       <p className='mt-2 text-sm text-muted-foreground'>
         Create an account to begin.
       </p>

@@ -54,9 +54,9 @@ export default function SignInForm({
 
   return (
     <div className='mx-auto w-full max-w-sm'>
-      <h1 className='cn-font-heading text-3xl'>Welcome back</h1>
+      <h1 className='cn-font-heading text-4xl'>Welcome back</h1>
       <p className='mt-2 text-sm text-muted-foreground'>
-        Sign in to keep writing.
+        Pick up where you left off.
       </p>
 
       <form
