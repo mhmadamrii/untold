@@ -20,7 +20,7 @@ export function Dashboard({
   const mostRecent = stories.data?.[0];
 
   return (
-    <div className='mx-auto max-w-4xl px-6 py-16'>
+    <div className='mx-auto max-w-6xl px-6 py-16'>
       <h1 className='cn-font-heading text-3xl'>
         Good morning, {firstName(session.user.name)}.
       </h1>

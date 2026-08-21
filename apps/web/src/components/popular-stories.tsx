@@ -46,11 +46,9 @@ export function PopularStories() {
             <p className='cn-font-heading text-lg group-hover:text-primary'>
               {story.title}
             </p>
-            {story.description && (
-              <p className='mt-2 line-clamp-3 text-sm text-muted-foreground'>
-                {story.description}
-              </p>
-            )}
+            <p className='mt-2 line-clamp-3 text-sm text-muted-foreground'>
+              {story.description || 'No description yet.'}
+            </p>
           </div>
           <div className='mt-6 flex items-center justify-between text-xs text-muted-foreground'>
             <span>{story.author.name}</span>

@@ -5,6 +5,16 @@ generator client {
   runtime      = "cloudflare"
 }
 
+// Cloudflare's wasm-edge query engine (above) only runs inside workerd —
+// local Bun scripts (e.g. seed.ts) need this Node/Bun-targeted client
+// instead.
+generator clientNode {
+  provider     = "prisma-client"
+  output       = "../generated-node"
+  moduleFormat = "esm"
+  runtime      = "bun"
+}
+
 datasource db {
   provider = "postgresql"
 }

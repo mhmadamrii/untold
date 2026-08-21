@@ -12,6 +12,12 @@ import { protectedProcedure, publicProcedure } from '../index';
 const FREE_CHAPTER_COUNT = 1;
 const LOCKED_PREVIEW_LENGTH = 180;
 
+// The public landing page surfaces titles to anonymous visitors with no
+// human review step, so a minimal profanity filter blocks the worst titles
+// from that specific feed. Real curation (editorial picks) should replace
+// this later — this only guards against the landing page looking broken.
+const BLOCKED_TITLE_PATTERN = /\b(fuck|shit|bitch|asshole|cunt)\b/i;
+
 const storyTypeSchema = z.enum(
   Object.values(StoryType) as [StoryType, ...StoryType[]],
 );
@@ -144,14 +150,18 @@ export const storyRouter = {
           storyType: input.storyType,
         },
         orderBy: [{ likes: { _count: 'desc' } }, { updatedAt: 'desc' }],
-        take: input.limit,
+        take: input.limit * 3,
         include: {
           author: { select: { name: true } },
           _count: { select: { chapters: true, likes: true, comments: true } },
         },
       });
 
-      return stories.map((story) => ({
+      const filtered = stories
+        .filter((story) => !BLOCKED_TITLE_PATTERN.test(story.title))
+        .slice(0, input.limit);
+
+      return filtered.map((story) => ({
         id: story.id,
         title: story.title,
         description: story.description,

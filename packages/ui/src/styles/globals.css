@@ -39,6 +39,8 @@
   --sidebar-accent-foreground: oklch(0.3 0.05 40);
   --sidebar-border: oklch(0.87 0.016 65);
   --sidebar-ring: oklch(0.53 0.15 45);
+  --font-heading: var(--font-lora), ui-serif, serif;
+  --font-reading: var(--font-lora), ui-serif, serif;
 }
 
 .dark {

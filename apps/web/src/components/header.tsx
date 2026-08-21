@@ -1,4 +1,13 @@
 'use client';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@untold/ui/components/sheet';
+import { Button } from '@untold/ui/components/button';
+import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -23,13 +32,13 @@ export default function Header() {
           <Image src='/logo.png' alt='' width={28} height={28} />
           Untold
         </Link>
-        <div className='flex items-center gap-6'>
-          <nav className='flex items-center gap-5'>
+        <div className='flex items-center gap-4 sm:gap-6'>
+          <nav className='hidden items-center gap-5 md:flex'>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className='text-sm text-muted-foreground transition-colors hover:text-foreground'
+                className='py-2 text-sm text-muted-foreground transition-colors hover:text-foreground'
               >
                 {link.label}
               </Link>
@@ -37,6 +46,32 @@ export default function Header() {
           </nav>
           <ModeToggle />
           <UserMenu />
+          <Sheet>
+            <SheetTrigger
+              render={
+                <Button variant='outline' size='icon' className='md:hidden' />
+              }
+            >
+              <Menu className='size-4' />
+              <span className='sr-only'>Open menu</span>
+            </SheetTrigger>
+            <SheetContent side='right'>
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <nav className='flex flex-col px-4'>
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className='border-b border-border py-3 text-sm text-foreground'
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>

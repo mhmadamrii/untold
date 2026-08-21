@@ -212,7 +212,12 @@ export default function LandingPage() {
             <p className='cn-font-heading mt-6 text-lg'>
               To be continued&hellip;
             </p>
-            <Button variant='outline' className='mt-4'>
+            <Button
+              variant='outline'
+              nativeButton={false}
+              className='mt-4'
+              render={<Link href='/login' />}
+            >
               Continue it
             </Button>
           </div>
