@@ -234,7 +234,7 @@ export function NewStoryWizard() {
 
       if (firstChapterId) {
         router.push(
-          `/stories/${storyId}/chapters/${firstChapterId}` as Route,
+          `/stories/${storyId}/edit/chapters/${firstChapterId}` as Route,
         );
         return;
       }

@@ -70,7 +70,7 @@ export function StoryCover({ coverImage }: { coverImage: string | null }) {
 
 export function StoryCard({ story }: { story: StoryListItem }) {
   return (
-    <Link href={`/stories/${story.id}`}>
+    <Link href={`/stories/${story.id}/edit`}>
       <Card size='sm' className='transition-colors hover:bg-secondary/40'>
         <StoryCover coverImage={story.coverImage} />
         <CardContent className='space-y-2'>
@@ -196,7 +196,7 @@ export function Dashboard({ session }: { session: Session }) {
             </div>
             <Button
               className='w-fit'
-              render={<Link href={`/stories/${mostRecent.id}`} />}
+              render={<Link href={`/stories/${mostRecent.id}/edit`} />}
               nativeButton={false}
             >
               Continue

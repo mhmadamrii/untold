@@ -89,7 +89,10 @@ export function ChapterEditor({
         setProposal(data.draft);
       },
       onError: (error) => {
-        if (error instanceof ORPCError && error.code === 'PRECONDITION_FAILED') {
+        if (
+          error instanceof ORPCError &&
+          error.code === 'PRECONDITION_FAILED'
+        ) {
           setAiUnavailable(true);
           toast.error("AI isn't set up for this project yet.");
           return;
@@ -131,8 +134,7 @@ export function ChapterEditor({
         clearTimeout(saveTimeoutRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, content, chapterId]);
+  }, [title, content, chapterId, updateChapter.mutate]);
 
   function handleAddChapter() {
     createChapter.mutate({
@@ -218,9 +220,7 @@ export function ChapterEditor({
         </div>
         <div className='flex items-center gap-3'>
           {statusLabel && (
-            <span className='text-xs text-muted-foreground'>
-              {statusLabel}
-            </span>
+            <span className='text-xs text-muted-foreground'>{statusLabel}</span>
           )}
           {story.data && (
             <ShareDialog
@@ -355,7 +355,11 @@ export function ChapterEditor({
                 <Button size='sm' onClick={handleUseProposal}>
                   Use it
                 </Button>
-                <Button size='sm' variant='outline' onClick={handleEditProposal}>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={handleEditProposal}
+                >
                   Edit
                 </Button>
                 <Button

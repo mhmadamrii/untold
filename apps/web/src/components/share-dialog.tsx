@@ -15,8 +15,8 @@ import {
 import { Input } from '@untold/ui/components/input';
 import { RadioGroup, RadioGroupItem } from '@untold/ui/components/radio-group';
 import { CopyIcon } from 'lucide-react';
-import { useState } from 'react';
 import type * as React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { orpc } from '@/utils/orpc';
@@ -104,9 +104,14 @@ export function ShareDialog({
           {OPTIONS.map((option) => (
             <label
               key={option.value}
+              htmlFor={`visibility-${option.value}`}
               className='flex cursor-pointer items-start gap-3 rounded-md border border-border p-3 has-data-checked:border-primary'
             >
-              <RadioGroupItem value={option.value} className='mt-0.5' />
+              <RadioGroupItem
+                value={option.value}
+                id={`visibility-${option.value}`}
+                className='mt-0.5'
+              />
               <span>
                 <span className='block text-sm font-medium'>
                   {option.label}
@@ -145,7 +150,9 @@ export function ShareDialog({
             Cancel
           </DialogClose>
           <Button
-            onClick={() => updateVisibility.mutate({ id: storyId, visibility: selected })}
+            onClick={() =>
+              updateVisibility.mutate({ id: storyId, visibility: selected })
+            }
             disabled={updateVisibility.isPending}
           >
             Save visibility

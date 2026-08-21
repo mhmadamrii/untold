@@ -53,13 +53,10 @@ export function StoryOverview({ storyId }: { storyId: string }) {
         This story doesn't have any chapters yet.
       </h1>
       <p className='max-w-md text-sm text-muted-foreground'>
-        Every story starts with a first page. Add a chapter and begin
-        writing.
+        Every story starts with a first page. Add a chapter and begin writing.
       </p>
       <Button
-        onClick={() =>
-          createChapter.mutate({ storyId, title: 'Chapter 1' })
-        }
+        onClick={() => createChapter.mutate({ storyId, title: 'Chapter 1' })}
         disabled={createChapter.isPending}
       >
         Add a first chapter
