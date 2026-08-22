@@ -2,9 +2,21 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Language } from '@untold/db/enums';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@untold/ui/components/alert-dialog';
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import { Input } from '@untold/ui/components/input';
+import { ScrollArea } from '@untold/ui/components/scroll-area';
 import {
   Select,
   SelectContent,
@@ -14,6 +26,7 @@ import {
 } from '@untold/ui/components/select';
 import { Textarea } from '@untold/ui/components/textarea';
 import { cn } from '@untold/ui/lib/utils';
+import { Trash2Icon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -126,6 +139,16 @@ export function ChapterEditor({
     }),
   );
 
+  const deleteChapter = useMutation(
+    orpc.chapter.delete.mutationOptions({
+      onSuccess: () => {
+        invalidateStory();
+        toast.success('Chapter deleted');
+      },
+      onError: (error) => toast.error(error.message),
+    }),
+  );
+
   useEffect(() => {
     if (chapter && initializedFor.current !== chapterId) {
       setTitle(chapter.title);
@@ -172,13 +195,25 @@ export function ChapterEditor({
     });
   }
 
+  function handleDeleteChapter(id: string) {
+    deleteChapter.mutate({ id });
+    if (id === chapterId) {
+      const remaining = chapters.find((c) => c.id !== id);
+      router.push(
+        remaining
+          ? `/stories/${storyId}/edit/chapters/${remaining.id}`
+          : `/stories/${storyId}/edit`,
+      );
+    }
+  }
+
   function handleStuckPrompt(prompt: string) {
     if (prompt === 'Continue from here') {
       notesPanelRef.current?.triggerGenerateDraft();
       return;
     }
     if (prompt === 'Ask me a question') {
-      notesPanelRef.current?.scrollToAsk();
+      notesPanelRef.current?.switchToAsk();
       return;
     }
     notesPanelRef.current?.openComposerWithPrompt(prompt);
@@ -241,8 +276,8 @@ export function ChapterEditor({
   }
 
   return (
-    <div className='flex min-h-screen flex-col'>
-      <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 lg:px-6'>
+    <div className='flex min-h-screen flex-col lg:h-screen lg:overflow-hidden'>
+      <div className='flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 lg:px-6'>
         <div className='flex min-w-0 items-center gap-3'>
           <Link
             href='/'
@@ -332,8 +367,8 @@ export function ChapterEditor({
         </div>
       </div>
 
-      <div className='grid flex-1 grid-cols-1 lg:grid-cols-[30%_40%_30%]'>
-        <aside className='flex flex-col border-b border-border lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-b-0'>
+      <div className='grid flex-1 grid-cols-1 lg:grid-cols-[30%_40%_30%] lg:overflow-hidden'>
+        <aside className='flex flex-col border-b border-border lg:h-full lg:overflow-hidden lg:border-r lg:border-b-0'>
           <div className='flex-1 overflow-y-auto py-4'>
             <div className='flex items-baseline justify-between gap-2 px-4'>
               <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
@@ -355,28 +390,69 @@ export function ChapterEditor({
                 const words = countWords(c.content);
                 const isActive = c.id === chapterId;
                 return (
-                  <Link
-                    key={c.id}
-                    href={`/stories/${storyId}/edit/chapters/${c.id}`}
-                    className={cn(
-                      'flex items-start gap-2 rounded-md border-l-[3px] px-3 py-2 text-sm transition-colors',
-                      isActive
-                        ? 'border-primary bg-primary/8 text-foreground'
-                        : 'border-transparent text-muted-foreground hover:bg-foreground/4 hover:text-foreground',
-                    )}
-                  >
-                    <span className='cn-font-heading mt-0.5 text-xs text-muted-foreground'>
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span className='min-w-0 flex-1'>
-                      <span className='block truncate'>{c.title}</span>
-                      <span className='block truncate text-xs text-muted-foreground'>
-                        {words > 0
-                          ? `${words} words · edited ${formatRelativeDate(new Date(c.updatedAt))}`
-                          : 'Empty · untitled'}
+                  <div key={c.id} className='group relative'>
+                    <Link
+                      href={`/stories/${storyId}/edit/chapters/${c.id}`}
+                      className={cn(
+                        'flex items-start gap-2 rounded-md border-l-[3px] px-3 py-2 pr-8 text-sm transition-colors',
+                        isActive
+                          ? 'border-primary bg-primary/8 text-foreground'
+                          : 'border-transparent text-muted-foreground hover:bg-foreground/4 hover:text-foreground',
+                      )}
+                    >
+                      <span className='cn-font-heading mt-0.5 text-xs text-muted-foreground'>
+                        {String(index + 1).padStart(2, '0')}
                       </span>
-                    </span>
-                  </Link>
+                      <span className='min-w-0 flex-1'>
+                        <span className='block truncate'>{c.title}</span>
+                        <span className='block truncate text-xs text-muted-foreground'>
+                          {words > 0
+                            ? `${words} words · edited ${formatRelativeDate(new Date(c.updatedAt))}`
+                            : 'Empty · untitled'}
+                        </span>
+                      </span>
+                    </Link>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger
+                        render={
+                          <Button
+                            variant='ghost'
+                            size='icon-xs'
+                            disabled={chapters.length === 1}
+                            className='absolute top-2 right-2 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100'
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        }
+                      >
+                        <Trash2Icon className='size-3.5' />
+                        <span className='sr-only'>
+                          Delete &ldquo;{c.title}&rdquo;
+                        </span>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Delete this chapter?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            &ldquo;{c.title}&rdquo; and its notes will be
+                            permanently deleted. This can&rsquo;t be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            variant='destructive'
+                            disabled={deleteChapter.isPending}
+                            onClick={() => handleDeleteChapter(c.id)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 );
               })}
               <button
@@ -403,55 +479,57 @@ export function ChapterEditor({
           </div>
         </aside>
 
-        <main className='flex flex-col px-6 py-10 sm:px-10'>
-          <div className='mx-auto flex w-full max-w-3xl flex-1 flex-col'>
-            <div className='flex flex-wrap items-baseline justify-between gap-2'>
-              <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
-                Chapter {chapterIndex + 1}
-              </p>
-              <p className='text-xs text-muted-foreground'>
-                {contentWordCount} words · about {readMinutes}{' '}
-                {readMinutes === 1 ? 'minute' : 'minutes'} to read
-              </p>
-            </div>
-            <Input
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder='Chapter title'
-              className='cn-font-heading mt-2 h-auto border-none bg-transparent px-0 text-3xl focus-visible:ring-0'
-            />
-            <div className='mt-6 flex-1 rounded-md bg-secondary/40 p-6 sm:p-10'>
-              <Textarea
-                ref={contentRef}
-                value={content}
-                onChange={(event) => setContent(event.target.value)}
-                placeholder='Begin your chapter…'
-                className='cn-font-reading min-h-[50vh] w-full resize-none border-none bg-transparent p-0 text-base focus-visible:ring-0'
+        <main className='flex flex-col lg:h-full lg:overflow-hidden'>
+          <ScrollArea className='flex-1'>
+            <div className='mx-auto w-full max-w-3xl px-6 py-10 sm:px-10'>
+              <div className='flex flex-wrap items-baseline justify-between gap-2'>
+                <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+                  Chapter {chapterIndex + 1}
+                </p>
+                <p className='text-xs text-muted-foreground'>
+                  {contentWordCount} words · about {readMinutes}{' '}
+                  {readMinutes === 1 ? 'minute' : 'minutes'} to read
+                </p>
+              </div>
+              <Input
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder='Chapter title'
+                className='cn-font-heading mt-2 h-auto border-none bg-transparent px-0 text-3xl focus-visible:ring-0'
               />
-            </div>
-            <div className='mt-6 flex flex-wrap items-center gap-2 rounded-md border border-primary/30 bg-primary/8 px-4 py-3'>
-              <span className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
-                Stuck?
-              </span>
-              {STUCK_PROMPTS.map((prompt, index) => (
-                <span key={prompt} className='flex items-center gap-2'>
-                  {index > 0 ? (
-                    <span className='text-muted-foreground'>·</span>
-                  ) : null}
-                  <button
-                    type='button'
-                    onClick={() => handleStuckPrompt(prompt)}
-                    className='text-sm text-foreground transition-colors hover:text-primary'
-                  >
-                    {prompt}
-                  </button>
+              <div className='mt-6 rounded-md bg-secondary/40 p-6 sm:p-10'>
+                <Textarea
+                  ref={contentRef}
+                  value={content}
+                  onChange={(event) => setContent(event.target.value)}
+                  placeholder='Begin your chapter…'
+                  className='cn-font-reading min-h-[50vh] w-full resize-none border-none bg-transparent p-0 text-base focus-visible:ring-0'
+                />
+              </div>
+              <div className='mt-6 flex flex-wrap items-center gap-2 rounded-md border border-primary/30 bg-primary/8 px-4 py-3'>
+                <span className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+                  Stuck?
                 </span>
-              ))}
+                {STUCK_PROMPTS.map((prompt, index) => (
+                  <span key={prompt} className='flex items-center gap-2'>
+                    {index > 0 ? (
+                      <span className='text-muted-foreground'>·</span>
+                    ) : null}
+                    <button
+                      type='button'
+                      onClick={() => handleStuckPrompt(prompt)}
+                      className='text-sm text-foreground transition-colors hover:text-primary'
+                    >
+                      {prompt}
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          </ScrollArea>
         </main>
 
-        <aside className='flex flex-col border-t border-border lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-t-0 lg:border-l'>
+        <aside className='flex flex-col border-t border-border lg:h-full lg:overflow-hidden lg:border-t-0 lg:border-l'>
           <NotesPanel
             ref={notesPanelRef}
             storyId={storyId}
