@@ -48,7 +48,6 @@ model Story {
   status         StoryStatus @default(DRAFT)
   visibility     Visibility  @default(PRIVATE)
   shareSlug      String?     @unique
-  notes          Note[]
   chapters       Chapter[]
   likes          Like[]
   comments       Comment[]
@@ -89,15 +88,15 @@ model Comment {
 
 model Note {
   id        String   @id @default(cuid())
-  storyId   String
-  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  chapterId String
+  chapter   Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   content   String
   order     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([storyId, order])
-  @@index([storyId])
+  @@unique([chapterId, order])
+  @@index([chapterId])
   @@map("note")
 }
 
@@ -108,6 +107,7 @@ model Chapter {
   title     String
   content   String   @default("")
   order     Int
+  notes     Note[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

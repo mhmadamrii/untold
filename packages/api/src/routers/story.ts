@@ -44,12 +44,7 @@ const storyFieldsSchema = z.object({
   visibility: visibilitySchema.optional(),
 });
 
-// The first note a story is created with (the big "what's on your mind"
-// textarea on /stories/new). Further notes are added one at a time through
-// the `note` router once the story exists.
-const createStoryInput = storyFieldsSchema.extend({
-  notes: z.string().trim().max(20_000).optional(),
-});
+const createStoryInput = storyFieldsSchema;
 
 const updateStoryInput = storyFieldsSchema.partial().extend({
   id: z.string(),
@@ -98,8 +93,10 @@ export const storyRouter = {
       const story = await context.db.story.findUnique({
         where: { id: input.id },
         include: {
-          notes: { orderBy: { order: 'asc' } },
-          chapters: { orderBy: { order: 'asc' } },
+          chapters: {
+            orderBy: { order: 'asc' },
+            include: { notes: { orderBy: { order: 'asc' } } },
+          },
         },
       });
       if (!story || story.authorId !== context.session.user.id) {
@@ -111,14 +108,11 @@ export const storyRouter = {
   create: protectedProcedure
     .input(createStoryInput)
     .handler(async ({ input, context }) => {
-      const { notes, ...data } = input;
       return context.db.story.create({
         data: {
-          ...data,
+          ...input,
           authorId: context.session.user.id,
-          notes: notes ? { create: [{ content: notes, order: 0 }] } : undefined,
         },
-        include: { notes: { orderBy: { order: 'asc' } } },
       });
     }),
 

@@ -25,6 +25,23 @@ async function findChapterOrThrow(db: Context['db'], id: string) {
   return chapter;
 }
 
+// Used by the note and ai routers, whose ownership check needs to go
+// through the parent story rather than the chapter itself.
+export async function findOwnedChapter(
+  db: Context['db'],
+  chapterId: string,
+  userId: string,
+) {
+  const chapter = await db.chapter.findUnique({
+    where: { id: chapterId },
+    include: { story: true },
+  });
+  if (!chapter || chapter.story.authorId !== userId) {
+    throw new ORPCError('NOT_FOUND', { message: 'Chapter not found' });
+  }
+  return chapter;
+}
+
 export const chapterRouter = {
   list: protectedProcedure
     .input(z.object({ storyId: z.string() }))

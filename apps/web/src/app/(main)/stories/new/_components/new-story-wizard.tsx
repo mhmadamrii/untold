@@ -141,6 +141,7 @@ export function NewStoryWizard() {
   );
   const updateStory = useMutation(orpc.story.update.mutationOptions());
   const createChapter = useMutation(orpc.chapter.create.mutationOptions());
+  const createNote = useMutation(orpc.note.create.mutationOptions());
 
   function fetchDirections() {
     suggestDirections.mutate(
@@ -166,7 +167,6 @@ export function NewStoryWizard() {
     createStory.mutate(
       {
         title: 'Untitled story',
-        notes,
         topic: topic.trim() || undefined,
         storyType: storyType ?? undefined,
         language,
@@ -231,6 +231,15 @@ export function NewStoryWizard() {
         });
         if (!firstChapterId) {
           firstChapterId = chapter.id;
+          // The idea notes from step one become chapter 1's first note —
+          // notes live per-chapter, and there's no chapter to attach them
+          // to until now.
+          if (notes.trim()) {
+            await createNote.mutateAsync({
+              chapterId: chapter.id,
+              content: notes.trim(),
+            });
+          }
         }
       }
 

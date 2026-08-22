@@ -9,6 +9,7 @@ import { z } from 'zod';
 
 import type { Context } from '../context';
 import { protectedProcedure } from '../index';
+import { findOwnedChapter } from './chapter';
 import { findOwnedStory } from './story';
 
 function requireAiConfigured() {
@@ -19,22 +20,22 @@ function requireAiConfigured() {
   }
 }
 
-async function loadStoryWithNotes(
+async function loadChapterWithNotes(
   db: Context['db'],
-  storyId: string,
+  chapterId: string,
   userId: string,
 ) {
-  const story = await findOwnedStory(db, storyId, userId);
+  const chapter = await findOwnedChapter(db, chapterId, userId);
   const notes = await db.note.findMany({
-    where: { storyId },
+    where: { chapterId },
     orderBy: { order: 'asc' },
   });
   if (notes.length === 0) {
     throw new ORPCError('BAD_REQUEST', {
-      message: 'Add a note first — Untold needs something to work with.',
+      message: 'Add a note to this chapter first — Untold needs something to work with.',
     });
   }
-  return { story, notes };
+  return { chapter, notes };
 }
 
 export const aiRouter = {
@@ -52,34 +53,48 @@ export const aiRouter = {
     }),
 
   generateDraft: protectedProcedure
-    .input(z.object({ storyId: z.string() }))
+    .input(z.object({ chapterId: z.string() }))
     .handler(async ({ input, context }) => {
       requireAiConfigured();
-      const { story, notes } = await loadStoryWithNotes(
+      const { chapter, notes } = await loadChapterWithNotes(
         context.db,
-        input.storyId,
+        input.chapterId,
         context.session.user.id,
       );
 
       const draft = await generateStoryDraft({
         notes: notes.map((note) => note.content),
-        title: story.title,
-        topic: story.topic ?? undefined,
-        aiInstructions: story.aiInstructions ?? undefined,
+        title: chapter.story.title,
+        topic: chapter.story.topic ?? undefined,
+        aiInstructions: chapter.story.aiInstructions ?? undefined,
       });
 
       return { draft };
     }),
 
+  // Not wired up in the UI yet. Notes now live per-chapter, so a
+  // whole-story synopsis pools notes across every chapter instead of a
+  // single story-level list.
   createSynopsis: protectedProcedure
     .input(z.object({ storyId: z.string() }))
     .handler(async ({ input, context }) => {
       requireAiConfigured();
-      const { story, notes } = await loadStoryWithNotes(
+      const story = await findOwnedStory(
         context.db,
         input.storyId,
         context.session.user.id,
       );
+      const chapters = await context.db.chapter.findMany({
+        where: { storyId: input.storyId },
+        orderBy: { order: 'asc' },
+        include: { notes: { orderBy: { order: 'asc' } } },
+      });
+      const notes = chapters.flatMap((chapter) => chapter.notes);
+      if (notes.length === 0) {
+        throw new ORPCError('BAD_REQUEST', {
+          message: 'Add a note first — Untold needs something to work with.',
+        });
+      }
 
       const synopsis = await generateSynopsis({
         notes: notes.map((note) => note.content),

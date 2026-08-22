@@ -1,6 +1,5 @@
 'use client';
 
-import { ORPCError } from '@orpc/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Language } from '@untold/db/enums';
 import { Badge } from '@untold/ui/components/badge';
@@ -23,6 +22,8 @@ import { toast } from 'sonner';
 import { ShareDialog } from '@/components/share-dialog';
 import { LANGUAGE_LABEL, VISIBILITY_LABEL } from '@/lib/story-labels';
 import { orpc } from '@/utils/orpc';
+
+import { NotesPanel, type NotesPanelHandle } from './notes-panel';
 
 const STUCK_PROMPTS = [
   'What happens next',
@@ -51,14 +52,13 @@ export function ChapterEditor({
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const [askText, setAskText] = useState('');
-  const [proposal, setProposal] = useState<string | null>(null);
-  const [aiUnavailable, setAiUnavailable] = useState(false);
+  const [storyTitle, setStoryTitle] = useState('');
 
   const initializedFor = useRef<string | null>(null);
   const hydratedRef = useRef(false);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const askInputRef = useRef<HTMLTextAreaElement>(null);
+  const storyTitleInitialized = useRef<string | null>(null);
+  const notesPanelRef = useRef<NotesPanelHandle>(null);
   const contentRef = useRef<HTMLTextAreaElement>(null);
 
   function invalidateStory() {
@@ -90,6 +90,13 @@ export function ChapterEditor({
     }),
   );
 
+  const updateStoryTitle = useMutation(
+    orpc.story.update.mutationOptions({
+      onSuccess: () => invalidateStory(),
+      onError: (error) => toast.error(error.message),
+    }),
+  );
+
   const createChapter = useMutation(
     orpc.chapter.create.mutationOptions({
       onSuccess: (newChapter) => {
@@ -100,26 +107,6 @@ export function ChapterEditor({
     }),
   );
 
-  const generateDraft = useMutation(
-    orpc.ai.generateDraft.mutationOptions({
-      onSuccess: (data) => {
-        setAiUnavailable(false);
-        setProposal(data.draft);
-      },
-      onError: (error) => {
-        if (
-          error instanceof ORPCError &&
-          error.code === 'PRECONDITION_FAILED'
-        ) {
-          setAiUnavailable(true);
-          toast.error("AI isn't set up for this project yet.");
-          return;
-        }
-        toast.error(error.message);
-      },
-    }),
-  );
-
   useEffect(() => {
     if (chapter && initializedFor.current !== chapterId) {
       setTitle(chapter.title);
@@ -127,10 +114,15 @@ export function ChapterEditor({
       initializedFor.current = chapterId;
       hydratedRef.current = false;
       setStatus('idle');
-      setProposal(null);
-      setAiUnavailable(false);
     }
   }, [chapter, chapterId]);
+
+  useEffect(() => {
+    if (story.data && storyTitleInitialized.current !== storyId) {
+      setStoryTitle(story.data.title);
+      storyTitleInitialized.current = storyId;
+    }
+  }, [story.data, storyId]);
 
   useEffect(() => {
     if (initializedFor.current !== chapterId) {
@@ -162,22 +154,24 @@ export function ChapterEditor({
   }
 
   function handleStuckPrompt(prompt: string) {
-    setAskText(prompt);
-    askInputRef.current?.focus();
+    notesPanelRef.current?.openComposerWithPrompt(prompt);
   }
 
-  function handleGenerate() {
-    generateDraft.mutate({ storyId });
-  }
-
-  function handleUseProposal() {
-    if (!proposal) {
-      return;
+  function handleStoryTitleBlur() {
+    const trimmed = storyTitle.trim();
+    if (trimmed && trimmed !== story.data?.title) {
+      updateStoryTitle.mutate({ id: storyId, title: trimmed });
+    } else if (!trimmed) {
+      setStoryTitle(story.data?.title ?? '');
     }
-    const next = content.trim() ? `${content}\n\n${proposal}` : proposal;
+  }
+
+  function handleUseProposal(proposalText: string) {
+    const next = content.trim()
+      ? `${content}\n\n${proposalText}`
+      : proposalText;
     setContent(next);
     updateChapter.mutate({ id: chapterId, title, content: next });
-    setProposal(null);
     toast.success('Added to your chapter');
   }
 
@@ -227,9 +221,13 @@ export function ChapterEditor({
             ← My stories
           </Link>
           <span className='text-border'>/</span>
-          <span className='cn-font-heading truncate text-sm'>
-            {story.data?.title}
-          </span>
+          <Input
+            value={storyTitle}
+            onChange={(event) => setStoryTitle(event.target.value)}
+            onBlur={handleStoryTitleBlur}
+            placeholder='Untitled story'
+            className='h-auto min-w-0 max-w-[220px] border-none bg-transparent p-0 cn-font-heading text-sm focus-visible:ring-0'
+          />
           {story.data && (
             <Badge variant='outline' className='shrink-0'>
               {VISIBILITY_LABEL[story.data.visibility]}
@@ -284,48 +282,39 @@ export function ChapterEditor({
         </div>
       </div>
 
-      <div className='grid flex-1 grid-cols-1 lg:grid-cols-[210px_1fr_300px]'>
-        <aside className='flex flex-col border-b border-border py-4 lg:border-r lg:border-b-0'>
-          <p className='cn-font-heading px-4 text-xs uppercase tracking-[0.14em] text-primary'>
-            Chapters
-          </p>
-          <nav className='mt-3 flex flex-col'>
-            {chapters.map((c, index) => (
-              <Link
-                key={c.id}
-                href={`/stories/${storyId}/edit/chapters/${c.id}`}
-                className={cn(
-                  'flex items-center gap-2 border-l-2 px-4 py-2 text-sm transition-colors',
-                  c.id === chapterId
-                    ? 'border-primary text-foreground'
-                    : 'border-transparent text-muted-foreground hover:text-foreground',
-                )}
-              >
-                <span className='cn-font-heading text-xs text-muted-foreground'>
-                  {String(index + 1).padStart(2, '0')}
-                </span>
-                <span className='truncate'>{c.title}</span>
-              </Link>
-            ))}
-            <button
-              type='button'
-              onClick={handleAddChapter}
-              disabled={createChapter.isPending}
-              className='mx-4 mt-2 rounded-sm border border-dashed border-border px-3 py-2 text-left text-xs text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50'
-            >
-              + Add chapter
-            </button>
-          </nav>
-          <div className='mt-6 border-t border-border px-4 pt-4'>
-            <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
-              Story
+      <div className='grid flex-1 grid-cols-1 lg:grid-cols-[30%_40%_30%]'>
+        <aside className='flex flex-col border-b border-border lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-b-0'>
+          <div className='flex-1 overflow-y-auto py-4'>
+            <p className='cn-font-heading px-4 text-xs uppercase tracking-[0.14em] text-primary'>
+              Chapters
             </p>
-            <Link
-              href={`/stories/${storyId}/edit`}
-              className='mt-2 block text-sm text-muted-foreground hover:text-foreground'
-            >
-              Notes
-            </Link>
+            <nav className='mt-3 flex flex-col'>
+              {chapters.map((c, index) => (
+                <Link
+                  key={c.id}
+                  href={`/stories/${storyId}/edit/chapters/${c.id}`}
+                  className={cn(
+                    'flex items-center gap-2 border-l-2 px-4 py-2 text-sm transition-colors',
+                    c.id === chapterId
+                      ? 'border-primary text-foreground'
+                      : 'border-transparent text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  <span className='cn-font-heading text-xs text-muted-foreground'>
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className='truncate'>{c.title}</span>
+                </Link>
+              ))}
+              <button
+                type='button'
+                onClick={handleAddChapter}
+                disabled={createChapter.isPending}
+                className='mx-4 mt-2 rounded-sm border border-dashed border-border px-3 py-2 text-left text-xs text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50'
+              >
+                + Add chapter
+              </button>
+            </nav>
           </div>
         </aside>
 
@@ -366,52 +355,15 @@ export function ChapterEditor({
           </div>
         </main>
 
-        <aside className='flex flex-col gap-4 border-t border-border p-4 lg:border-t-0 lg:border-l lg:p-6'>
-          <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
-            Companion
-          </p>
-          <Textarea
-            ref={askInputRef}
-            value={askText}
-            onChange={(event) => setAskText(event.target.value)}
-            placeholder='Ask, or paste a fragment…'
-            className='min-h-24 text-sm'
+        <aside className='flex flex-col border-t border-border lg:sticky lg:top-0 lg:h-screen lg:border-t-0 lg:border-l'>
+          <NotesPanel
+            ref={notesPanelRef}
+            chapterId={chapterId}
+            notes={chapter?.notes ?? []}
+            onNotesChanged={invalidateStory}
+            onUseProposal={handleUseProposal}
+            onEditProposal={handleEditProposal}
           />
-          <Button onClick={handleGenerate} disabled={generateDraft.isPending}>
-            {generateDraft.isPending ? 'Thinking…' : 'Generate a draft'}
-          </Button>
-          {aiUnavailable && (
-            <p className='text-xs text-muted-foreground'>
-              AI isn't set up for this project yet.
-            </p>
-          )}
-          {proposal && (
-            <div className='rounded-md border border-primary/30 bg-primary/10 p-4'>
-              <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
-                Proposal
-              </p>
-              <p className='cn-font-reading mt-2 text-sm'>{proposal}</p>
-              <div className='mt-3 flex flex-wrap gap-2'>
-                <Button size='sm' onClick={handleUseProposal}>
-                  Use it
-                </Button>
-                <Button
-                  size='sm'
-                  variant='outline'
-                  onClick={handleEditProposal}
-                >
-                  Edit
-                </Button>
-                <Button
-                  size='sm'
-                  variant='ghost'
-                  onClick={() => setProposal(null)}
-                >
-                  Dismiss
-                </Button>
-              </div>
-            </div>
-          )}
         </aside>
       </div>
     </div>
