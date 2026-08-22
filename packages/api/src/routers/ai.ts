@@ -1,4 +1,5 @@
 import { ORPCError } from '@orpc/server';
+import { Language } from '@untold/db';
 import {
   generateStoryDraft,
   generateSynopsis,
@@ -19,6 +20,11 @@ function requireAiConfigured() {
     });
   }
 }
+
+const LANGUAGE_NAME: Record<Language, string> = {
+  [Language.ENGLISH]: 'English',
+  [Language.INDONESIAN]: 'Indonesian',
+};
 
 async function loadChapterWithNotes(
   db: Context['db'],
@@ -45,11 +51,18 @@ export const aiRouter = {
         notes: z.string().trim().min(1).max(20_000),
         topic: z.string().trim().max(200).optional(),
         storyType: z.string().max(50).optional(),
+        language: z
+          .enum(Object.values(Language) as [Language, ...Language[]])
+          .optional(),
       }),
     )
     .handler(async ({ input }) => {
       requireAiConfigured();
-      return suggestStoryDirections(input);
+      const { language, ...rest } = input;
+      return suggestStoryDirections({
+        ...rest,
+        language: language ? LANGUAGE_NAME[language] : undefined,
+      });
     }),
 
   generateDraft: protectedProcedure
@@ -67,6 +80,7 @@ export const aiRouter = {
         title: chapter.story.title,
         topic: chapter.story.topic ?? undefined,
         aiInstructions: chapter.story.aiInstructions ?? undefined,
+        language: LANGUAGE_NAME[chapter.story.language],
       });
 
       return { draft };
@@ -100,6 +114,7 @@ export const aiRouter = {
         notes: notes.map((note) => note.content),
         title: story.title,
         topic: story.topic ?? undefined,
+        language: LANGUAGE_NAME[story.language],
       });
 
       return context.db.story.update({

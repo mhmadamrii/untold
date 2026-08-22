@@ -149,6 +149,7 @@ export function NewStoryWizard() {
         notes,
         topic: topic.trim() || undefined,
         storyType: storyType ?? undefined,
+        language,
       },
       {
         onError: (error) => {

@@ -34,6 +34,12 @@ const SYSTEM_PROMPT = [
   'could become.',
 ].join(' ');
 
+function languageSystemPrompt(language?: string): string {
+  return language
+    ? ` Write entirely in ${language} — every word of your output, not just the prose.`
+    : '';
+}
+
 // generateText has no structured-output guardrail, so models default to
 // chatty preamble ("Here's a possible opening...") and markdown separators.
 // The UI renders this output directly as story prose, so it must be clean.
@@ -62,6 +68,7 @@ export async function suggestStoryDirections(input: {
   notes: string;
   topic?: string;
   storyType?: string;
+  language?: string;
 }): Promise<StoryDirectionSuggestion> {
   const google = getGoogleProvider();
 
@@ -79,7 +86,7 @@ export async function suggestStoryDirections(input: {
   const { object } = await generateObject({
     model: google('gemini-2.5-flash'),
     schema: storyDirectionSchema,
-    system: SYSTEM_PROMPT,
+    system: `${SYSTEM_PROMPT}${languageSystemPrompt(input.language)}`,
     prompt,
   });
 
@@ -91,6 +98,7 @@ export async function generateStoryDraft(input: {
   title?: string;
   topic?: string;
   aiInstructions?: string;
+  language?: string;
 }): Promise<string> {
   const google = getGoogleProvider();
 
@@ -113,7 +121,7 @@ export async function generateStoryDraft(input: {
 
   const { text } = await generateText({
     model: google('gemini-2.5-flash'),
-    system: `${SYSTEM_PROMPT} ${RAW_OUTPUT_INSTRUCTION}`,
+    system: `${SYSTEM_PROMPT}${languageSystemPrompt(input.language)} ${RAW_OUTPUT_INSTRUCTION}`,
     prompt,
   });
 
@@ -124,6 +132,7 @@ export async function generateSynopsis(input: {
   notes: string[];
   title?: string;
   topic?: string;
+  language?: string;
 }): Promise<string> {
   const google = getGoogleProvider();
 
@@ -143,7 +152,7 @@ export async function generateSynopsis(input: {
 
   const { text } = await generateText({
     model: google('gemini-2.5-flash'),
-    system: `${SYSTEM_PROMPT} ${RAW_OUTPUT_INSTRUCTION}`,
+    system: `${SYSTEM_PROMPT}${languageSystemPrompt(input.language)} ${RAW_OUTPUT_INSTRUCTION}`,
     prompt,
   });
 
