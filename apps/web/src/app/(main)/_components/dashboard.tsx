@@ -1,14 +1,27 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { StoryStatus, type Visibility } from '@untold/db/enums';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@untold/ui/components/alert-dialog';
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import { Card, CardContent } from '@untold/ui/components/card';
 import { Skeleton } from '@untold/ui/components/skeleton';
 import { cn } from '@untold/ui/lib/utils';
+import { Trash2Icon } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import type { authClient } from '@/lib/auth-client';
 import { formatRelativeDate } from '@/lib/format-date';
@@ -69,28 +82,79 @@ export function StoryCover({ coverImage }: { coverImage: string | null }) {
 }
 
 export function StoryCard({ story }: { story: StoryListItem }) {
+  const queryClient = useQueryClient();
+
+  const deleteStory = useMutation(
+    orpc.story.delete.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.story.list.queryKey() });
+        toast.success('Story deleted.');
+      },
+      onError: (error) => toast.error(error.message),
+    }),
+  );
+
   return (
-    <Link href={`/stories/${story.id}/edit`}>
-      <Card size='sm' className='transition-colors hover:bg-secondary/40'>
-        <StoryCover coverImage={story.coverImage} />
-        <CardContent className='space-y-2'>
-          <div className='flex flex-wrap gap-1.5'>
-            <Badge variant='outline'>{STORY_STATUS_LABEL[story.status]}</Badge>
-            <Badge variant='outline'>
-              {VISIBILITY_LABEL[story.visibility]}
-            </Badge>
-          </div>
-          <p className='cn-font-heading text-base leading-snug'>
-            {story.title}
-          </p>
-          <p className='text-xs text-muted-foreground'>
-            {story._count.chapters}{' '}
-            {story._count.chapters === 1 ? 'chapter' : 'chapters'} · updated{' '}
-            {formatRelativeDate(new Date(story.updatedAt))}
-          </p>
-        </CardContent>
-      </Card>
-    </Link>
+    <div className='group relative'>
+      <Link href={`/stories/${story.id}/edit`}>
+        <Card size='sm' className='transition-colors hover:bg-secondary/40'>
+          <StoryCover coverImage={story.coverImage} />
+          <CardContent className='space-y-2'>
+            <div className='flex flex-wrap gap-1.5'>
+              <Badge variant='outline'>
+                {STORY_STATUS_LABEL[story.status]}
+              </Badge>
+              <Badge variant='outline'>
+                {VISIBILITY_LABEL[story.visibility]}
+              </Badge>
+            </div>
+            <p className='cn-font-heading text-base leading-snug'>
+              {story.title}
+            </p>
+            <p className='text-xs text-muted-foreground'>
+              {story._count.chapters}{' '}
+              {story._count.chapters === 1 ? 'chapter' : 'chapters'} · updated{' '}
+              {formatRelativeDate(new Date(story.updatedAt))}
+            </p>
+          </CardContent>
+        </Card>
+      </Link>
+
+      <AlertDialog>
+        <AlertDialogTrigger
+          render={
+            <Button
+              variant='outline'
+              size='icon-sm'
+              className='absolute top-2 right-2 bg-card opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100'
+              onClick={(event) => event.stopPropagation()}
+            />
+          }
+        >
+          <Trash2Icon className='size-3.5' />
+          <span className='sr-only'>Delete &ldquo;{story.title}&rdquo;</span>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this story?</AlertDialogTitle>
+            <AlertDialogDescription>
+              &ldquo;{story.title}&rdquo; and all its chapters will be
+              permanently deleted. This can&rsquo;t be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant='destructive'
+              disabled={deleteStory.isPending}
+              onClick={() => deleteStory.mutate({ id: story.id })}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }
 

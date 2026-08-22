@@ -1,6 +1,6 @@
 'use client';
 
-import { StoryType } from '@untold/db/enums';
+import { Language, StoryType } from '@untold/db/enums';
 import { Button } from '@untold/ui/components/button';
 import { Input } from '@untold/ui/components/input';
 import {
@@ -19,7 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { STORY_TYPE_LABEL } from '@/lib/story-labels';
+import { LANGUAGE_LABEL, STORY_TYPE_LABEL } from '@/lib/story-labels';
 import { orpc } from '@/utils/orpc';
 
 type Step = 'idea' | 'explore' | 'shape';
@@ -131,6 +131,7 @@ export function NewStoryWizard() {
   const [notes, setNotes] = useState('');
   const [topic, setTopic] = useState('');
   const [storyType, setStoryType] = useState<StoryType | null>(null);
+  const [language, setLanguage] = useState<Language>(Language.ENGLISH);
   const [chapters, setChapters] = useState<string[]>(['Chapter 1']);
   const [isCreatingChapters, setIsCreatingChapters] = useState(false);
 
@@ -168,6 +169,7 @@ export function NewStoryWizard() {
         notes,
         topic: topic.trim() || undefined,
         storyType: storyType ?? undefined,
+        language,
       },
       {
         onSuccess: (story) => {
@@ -300,6 +302,21 @@ export function NewStoryWizard() {
               placeholder='Topic, e.g. Childhood'
               className='sm:max-w-56'
             />
+            <Select
+              value={language}
+              onValueChange={(value) => setLanguage(value as Language)}
+            >
+              <SelectTrigger className='sm:w-44'>
+                <SelectValue placeholder='Language' />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(Language).map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {LANGUAGE_LABEL[value]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className='mt-8'>

@@ -1,5 +1,5 @@
 import { ORPCError } from '@orpc/server';
-import { StoryStatus, StoryType, Visibility } from '@untold/db';
+import { Language, StoryStatus, StoryType, Visibility } from '@untold/db';
 import { z } from 'zod';
 
 import type { Context } from '../context';
@@ -27,6 +27,9 @@ const visibilitySchema = z.enum(
 const storyStatusSchema = z.enum(
   Object.values(StoryStatus) as [StoryStatus, ...StoryStatus[]],
 );
+const languageSchema = z.enum(
+  Object.values(Language) as [Language, ...Language[]],
+);
 
 const storyFieldsSchema = z.object({
   title: z.string().trim().min(1).max(200),
@@ -34,6 +37,7 @@ const storyFieldsSchema = z.object({
   topic: z.string().trim().max(200).optional(),
   category: z.string().trim().max(200).optional(),
   storyType: storyTypeSchema.optional(),
+  language: languageSchema.optional(),
   aiInstructions: z.string().max(5000).optional(),
   coverImage: z.string().url().optional(),
   tags: z.array(z.string().trim().max(50)).max(20).optional(),

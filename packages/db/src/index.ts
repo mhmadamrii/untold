@@ -37,4 +37,9 @@ export function createPrismaClient(): PrismaClient {
 // }
 
 export type { Chapter, PrismaClient, Story } from '../prisma/generated/client';
-export { StoryStatus, StoryType, Visibility } from '../prisma/generated/client';
+export {
+  Language,
+  StoryStatus,
+  StoryType,
+  Visibility,
+} from '../prisma/generated/client';

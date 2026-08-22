@@ -1,4 +1,9 @@
-import type { StoryStatus, StoryType, Visibility } from '@untold/db/enums';
+import type {
+  Language,
+  StoryStatus,
+  StoryType,
+  Visibility,
+} from '@untold/db/enums';
 
 export const STORY_TYPE_LABEL: Record<StoryType, string> = {
   PERSONAL: 'Personal Story',
@@ -27,4 +32,9 @@ export const VISIBILITY_LABEL: Record<Visibility, string> = {
   PRIVATE: 'Private',
   LINK: 'Anyone with the link',
   PUBLIC: 'Public',
+};
+
+export const LANGUAGE_LABEL: Record<Language, string> = {
+  ENGLISH: 'English',
+  INDONESIAN: 'Bahasa Indonesia',
 };

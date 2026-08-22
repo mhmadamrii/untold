@@ -27,6 +27,11 @@ enum Visibility {
   PUBLIC
 }
 
+enum Language {
+  ENGLISH
+  INDONESIAN
+}
+
 model Story {
   id             String      @id @default(cuid())
   authorId       String
@@ -36,6 +41,7 @@ model Story {
   topic          String?
   category       String?
   storyType      StoryType?
+  language       Language    @default(ENGLISH)
   aiInstructions String?
   coverImage     String?
   tags           String[]    @default([])

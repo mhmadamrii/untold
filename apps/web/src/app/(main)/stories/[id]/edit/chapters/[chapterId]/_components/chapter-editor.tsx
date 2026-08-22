@@ -2,9 +2,17 @@
 
 import { ORPCError } from '@orpc/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Language } from '@untold/db/enums';
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import { Input } from '@untold/ui/components/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@untold/ui/components/select';
 import { Textarea } from '@untold/ui/components/textarea';
 import { cn } from '@untold/ui/lib/utils';
 import Link from 'next/link';
@@ -13,7 +21,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ShareDialog } from '@/components/share-dialog';
-import { VISIBILITY_LABEL } from '@/lib/story-labels';
+import { LANGUAGE_LABEL, VISIBILITY_LABEL } from '@/lib/story-labels';
 import { orpc } from '@/utils/orpc';
 
 const STUCK_PROMPTS = [
@@ -69,6 +77,16 @@ export function ChapterEditor({
         setStatus('idle');
         toast.error(error.message);
       },
+    }),
+  );
+
+  const updateLanguage = useMutation(
+    orpc.story.update.mutationOptions({
+      onSuccess: () => {
+        invalidateStory();
+        toast.success('Language updated');
+      },
+      onError: (error) => toast.error(error.message),
     }),
   );
 
@@ -221,6 +239,28 @@ export function ChapterEditor({
         <div className='flex items-center gap-3'>
           {statusLabel && (
             <span className='text-xs text-muted-foreground'>{statusLabel}</span>
+          )}
+          {story.data && (
+            <Select
+              value={story.data.language}
+              onValueChange={(value) =>
+                updateLanguage.mutate({
+                  id: storyId,
+                  language: value as Language,
+                })
+              }
+            >
+              <SelectTrigger size='sm'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(Language).map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {LANGUAGE_LABEL[value]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
           {story.data && (
             <ShareDialog
