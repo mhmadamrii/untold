@@ -1,9 +1,9 @@
 'use client';
 
-import { ORPCError } from '@orpc/client';
-import { useMutation } from '@tanstack/react-query';
 import { DragDropProvider, type DragEndEvent } from '@dnd-kit/react';
 import { useSortable } from '@dnd-kit/react/sortable';
+import { ORPCError } from '@orpc/client';
+import { useMutation } from '@tanstack/react-query';
 import { Button } from '@untold/ui/components/button';
 import {
   Dialog,
@@ -15,11 +15,17 @@ import {
 } from '@untold/ui/components/dialog';
 import { Textarea } from '@untold/ui/components/textarea';
 import { cn } from '@untold/ui/lib/utils';
-import { GripVertical, PlusIcon, Trash2Icon } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  GripVertical,
+  PlusIcon,
+  Trash2Icon,
+} from 'lucide-react';
 import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from 'react';
 import { toast } from 'sonner';
@@ -30,7 +36,17 @@ export type NoteItem = { id: string; content: string };
 
 export type NotesPanelHandle = {
   openComposerWithPrompt: (text: string) => void;
+  triggerGenerateDraft: () => void;
+  scrollToAsk: () => void;
 };
+
+const ASK_SCOPES = ['Selection', 'Chapter', 'Whole story'] as const;
+type AskScope = (typeof ASK_SCOPES)[number];
+
+function countWords(text: string) {
+  const trimmed = text.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+}
 
 function arrayMove<T>(array: T[], from: number, to: number): T[] {
   const copy = array.slice();
@@ -108,14 +124,30 @@ function NoteRow({
 export const NotesPanel = forwardRef<
   NotesPanelHandle,
   {
+    storyId: string;
     chapterId: string;
+    chapterLabel: string;
     notes: NoteItem[];
+    description: string | null;
+    chapterCount: number;
+    totalNotesCount: number;
     onNotesChanged: () => void;
     onUseProposal: (text: string) => void;
     onEditProposal: () => void;
   }
 >(function NotesPanel(
-  { chapterId, notes, onNotesChanged, onUseProposal, onEditProposal },
+  {
+    storyId,
+    chapterId,
+    chapterLabel,
+    notes,
+    description,
+    chapterCount,
+    totalNotesCount,
+    onNotesChanged,
+    onUseProposal,
+    onEditProposal,
+  },
   ref,
 ) {
   const [localNotes, setLocalNotes] = useState(notes);
@@ -123,6 +155,26 @@ export const NotesPanel = forwardRef<
   const [aiUnavailable, setAiUnavailable] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [draftText, setDraftText] = useState('');
+
+  const [showSynopsis, setShowSynopsis] = useState(Boolean(description));
+  const [editingSynopsis, setEditingSynopsis] = useState(false);
+  const [synopsisDraft, setSynopsisDraft] = useState(description ?? '');
+  const [askDraft, setAskDraft] = useState('');
+  const [askScope, setAskScope] = useState<AskScope>('Chapter');
+
+  const notesSectionRef = useRef<HTMLDivElement>(null);
+  const synopsisSectionRef = useRef<HTMLDivElement>(null);
+  const askSectionRef = useRef<HTMLDivElement>(null);
+
+  // Resync only when the server description changes underneath us (a fresh
+  // regenerate, or another tab's edit) — not on every render, or an
+  // in-progress edit would get clobbered while the user is typing.
+  useEffect(() => {
+    setSynopsisDraft(description ?? '');
+    if (description) {
+      setShowSynopsis(true);
+    }
+  }, [description]);
 
   const notesKey = notes.map((note) => note.id).join(',');
   // Resync only when the set/order of note ids changes (add, delete, or a
@@ -132,13 +184,6 @@ export const NotesPanel = forwardRef<
   useEffect(() => {
     setLocalNotes(notes);
   }, [notesKey]);
-
-  useImperativeHandle(ref, () => ({
-    openComposerWithPrompt(text) {
-      setDraftText(text);
-      setDialogOpen(true);
-    },
-  }));
 
   const createNote = useMutation(
     orpc.note.create.mutationOptions({
@@ -196,12 +241,77 @@ export const NotesPanel = forwardRef<
     }),
   );
 
+  const createSynopsis = useMutation(
+    orpc.ai.createSynopsis.mutationOptions({
+      onSuccess: () => {
+        setAiUnavailable(false);
+        onNotesChanged();
+      },
+      onError: (error) => {
+        if (
+          error instanceof ORPCError &&
+          error.code === 'PRECONDITION_FAILED'
+        ) {
+          setAiUnavailable(true);
+          toast.error("AI isn't set up for this project yet.");
+          return;
+        }
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const updateStoryDescription = useMutation(
+    orpc.story.update.mutationOptions({
+      onSuccess: () => {
+        setEditingSynopsis(false);
+        onNotesChanged();
+        toast.success('Synopsis updated');
+      },
+      onError: (error) => toast.error(error.message),
+    }),
+  );
+
+  useImperativeHandle(ref, () => ({
+    openComposerWithPrompt(text) {
+      setDraftText(text);
+      setDialogOpen(true);
+    },
+    triggerGenerateDraft() {
+      if (localNotes.length === 0) {
+        toast.error('Add a note first, Untold needs something to work with.');
+        return;
+      }
+      generateDraft.mutate({ chapterId });
+    },
+    scrollToAsk() {
+      askSectionRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    },
+  }));
+
   function handleAddNote() {
     const trimmed = draftText.trim();
     if (!trimmed) {
       return;
     }
     createNote.mutate({ chapterId, content: trimmed });
+  }
+
+  function handleSaveSynopsis() {
+    updateStoryDescription.mutate({
+      id: storyId,
+      description: synopsisDraft.trim(),
+    });
+  }
+
+  function handleAskSubmit() {
+    if (!askDraft.trim()) {
+      return;
+    }
+    toast("Ask isn't available yet, coming soon.");
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -229,12 +339,54 @@ export const NotesPanel = forwardRef<
     setProposal(null);
   }
 
+  const synopsisWordCount = countWords(description ?? '');
+
+  function scrollToSection(target: { current: HTMLDivElement | null }) {
+    target.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   return (
     <>
       <div className='flex-1 overflow-y-auto p-4 lg:p-6'>
-        <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
-          Companion
-        </p>
+        <div className='flex items-center justify-between gap-2'>
+          <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+            Companion
+          </p>
+          <span className='flex items-center gap-0.5 text-xs text-muted-foreground'>
+            {chapterLabel}
+            <ChevronDownIcon className='size-3' />
+          </span>
+        </div>
+
+        <div className='mt-4 grid grid-cols-3 gap-2'>
+          <button
+            type='button'
+            onClick={() => scrollToSection(notesSectionRef)}
+            className='cn-font-heading rounded-md border border-primary/40 bg-primary/5 py-1.5 text-xs text-primary transition-colors'
+          >
+            Notes
+          </button>
+          <button
+            type='button'
+            onClick={() => scrollToSection(synopsisSectionRef)}
+            className='cn-font-heading rounded-md border border-transparent py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground'
+          >
+            Synopsis
+          </button>
+          <button
+            type='button'
+            onClick={() => scrollToSection(askSectionRef)}
+            className='cn-font-heading rounded-md border border-transparent py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground'
+          >
+            Ask
+          </button>
+        </div>
+
+        {aiUnavailable && (
+          <p className='mt-3 text-xs text-muted-foreground'>
+            AI isn't set up for this project yet.
+          </p>
+        )}
 
         {proposal && (
           <div className='mt-4 rounded-md border border-primary/30 bg-primary/10 p-4'>
@@ -260,10 +412,16 @@ export const NotesPanel = forwardRef<
           </div>
         )}
 
-        <div className='mt-4 flex items-center justify-between gap-2'>
+        <div
+          ref={notesSectionRef}
+          className='mt-4 flex items-center justify-between gap-2'
+        >
           <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
             Notes for this chapter
           </p>
+          <span className='text-xs text-muted-foreground'>
+            {localNotes.length}
+          </span>
           <Dialog
             open={dialogOpen}
             onOpenChange={(open) => {
@@ -336,19 +494,134 @@ export const NotesPanel = forwardRef<
         </Button>
       </div>
 
-      <div className='border-t border-border p-4 lg:p-6'>
-        {aiUnavailable && (
-          <p className='mb-2 text-xs text-muted-foreground'>
-            AI isn't set up for this project yet.
+      <div
+        ref={synopsisSectionRef}
+        className='border-t border-border p-4 lg:p-6'
+      >
+        <div className='flex items-center justify-between gap-2'>
+          <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+            Synopsis
           </p>
+          <span className='text-xs text-muted-foreground'>Story level</span>
+        </div>
+        <p className='mt-2 text-xs text-muted-foreground'>
+          The few lines readers see on your story card and in Discover. Written
+          from your chapters and notes, edit it freely.
+        </p>
+
+        {showSynopsis ? (
+          <div className='mt-3 rounded-md border border-primary/30 bg-primary/10 p-4'>
+            {editingSynopsis ? (
+              <Textarea
+                value={synopsisDraft}
+                onChange={(event) => setSynopsisDraft(event.target.value)}
+                className='min-h-24 resize-none border-none bg-transparent p-0 text-sm focus-visible:ring-0'
+                autoFocus
+              />
+            ) : (
+              <p className='cn-font-reading text-sm'>{description}</p>
+            )}
+            <p className='mt-3 text-xs text-muted-foreground'>
+              {synopsisWordCount} words · from {chapterCount}{' '}
+              {chapterCount === 1 ? 'chapter' : 'chapters'}, {totalNotesCount}{' '}
+              {totalNotesCount === 1 ? 'note' : 'notes'}
+            </p>
+            <div className='mt-3 flex flex-wrap items-center gap-2'>
+              {editingSynopsis ? (
+                <>
+                  <Button
+                    size='sm'
+                    onClick={handleSaveSynopsis}
+                    disabled={updateStoryDescription.isPending}
+                  >
+                    {updateStoryDescription.isPending ? 'Saving…' : 'Save'}
+                  </Button>
+                  <Button
+                    size='sm'
+                    variant='ghost'
+                    onClick={() => {
+                      setEditingSynopsis(false);
+                      setSynopsisDraft(description ?? '');
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    size='sm'
+                    onClick={() =>
+                      toast.success('This synopsis is live on your story card.')
+                    }
+                  >
+                    Use it
+                  </Button>
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    onClick={() => setEditingSynopsis(true)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    onClick={() => createSynopsis.mutate({ storyId })}
+                    disabled={createSynopsis.isPending}
+                  >
+                    {createSynopsis.isPending ? 'Regenerating…' : 'Regenerate'}
+                  </Button>
+                  <button
+                    type='button'
+                    onClick={() => setShowSynopsis(false)}
+                    className='text-xs text-primary hover:underline'
+                  >
+                    Dismiss
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ) : (
+          <Button
+            variant='outline'
+            size='sm'
+            className='mt-3 w-full'
+            onClick={() => createSynopsis.mutate({ storyId })}
+            disabled={createSynopsis.isPending || totalNotesCount === 0}
+          >
+            {createSynopsis.isPending ? 'Writing…' : 'Generate a synopsis'}
+          </Button>
         )}
-        <Button
-          className='w-full'
-          onClick={() => generateDraft.mutate({ chapterId })}
-          disabled={generateDraft.isPending || localNotes.length === 0}
-        >
-          {generateDraft.isPending ? 'Thinking…' : 'Generate a draft'}
-        </Button>
+      </div>
+
+      <div ref={askSectionRef} className='border-t border-border p-4 lg:p-6'>
+        <Textarea
+          value={askDraft}
+          onChange={(event) => setAskDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault();
+              handleAskSubmit();
+            }
+          }}
+          placeholder='Ask, or paste a fragment…'
+          className='min-h-16 resize-none text-sm'
+        />
+        <div className='mt-2 flex flex-wrap gap-2'>
+          {ASK_SCOPES.map((scope) => (
+            <Button
+              key={scope}
+              type='button'
+              size='sm'
+              variant={askScope === scope ? 'default' : 'outline'}
+              onClick={() => setAskScope(scope)}
+            >
+              {scope}
+            </Button>
+          ))}
+        </div>
       </div>
     </>
   );

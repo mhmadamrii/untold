@@ -1,4 +1,5 @@
 'use client';
+import { Button } from '@untold/ui/components/button';
 import {
   Sheet,
   SheetContent,
@@ -6,10 +7,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@untold/ui/components/sheet';
-import { Button } from '@untold/ui/components/button';
 import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { ModeToggle } from './mode-toggle';
 import UserMenu from './user-menu';
@@ -20,7 +21,15 @@ const navLinks = [
   { href: '/profile', label: 'Profile' },
 ] as const;
 
+const CHAPTER_EDITOR_PATTERN = /^\/stories\/[^/]+\/edit\/chapters\/[^/]+/;
+
 export default function Header() {
+  const pathname = usePathname();
+
+  if (pathname && CHAPTER_EDITOR_PATTERN.test(pathname)) {
+    return null;
+  }
+
   return (
     <header className='border-b border-border'>
       <div className='mx-auto flex max-w-6xl items-center justify-between px-6 py-4'>

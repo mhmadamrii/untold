@@ -287,49 +287,50 @@ export function NewStoryWizard() {
             className='mt-8 min-h-[150px] text-sm'
           />
 
-          <div className='mt-4 flex flex-col gap-3 sm:flex-row sm:items-center'>
-            <span className='cn-font-heading text-xs uppercase tracking-[0.14em] text-muted-foreground'>
+          <div className='mt-8'>
+            <span className='cn-font-heading block text-xs uppercase tracking-[0.14em] text-muted-foreground'>
               All optional
             </span>
-            <Select
-              value={storyType}
-              onValueChange={(value) => setStoryType(value)}
-            >
-              <SelectTrigger className='sm:w-52'>
-                <SelectValue placeholder='Story type' />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(StoryType).map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {STORY_TYPE_LABEL[type]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder='Topic, e.g. Childhood'
-              className='sm:max-w-56'
-            />
-            <Select
-              value={language}
-              onValueChange={(value) => setLanguage(value as Language)}
-            >
-              <SelectTrigger className='sm:w-44'>
-                <SelectValue placeholder='Language' />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(Language).map((value) => (
-                  <SelectItem key={value} value={value}>
-                    {LANGUAGE_LABEL[value]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className='mt-3 grid gap-3 sm:grid-cols-3'>
+              <Select
+                value={storyType}
+                onValueChange={(value) => setStoryType(value)}
+              >
+                <SelectTrigger className='w-full'>
+                  <SelectValue placeholder='Story type' />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(StoryType).map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {STORY_TYPE_LABEL[type]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder='Topic, e.g. Childhood'
+              />
+              <Select
+                value={language}
+                onValueChange={(value) => setLanguage(value as Language)}
+              >
+                <SelectTrigger className='w-full'>
+                  <SelectValue placeholder='Language' />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(Language).map((value) => (
+                    <SelectItem key={value} value={value}>
+                      {LANGUAGE_LABEL[value]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className='mt-8'>
+          <div className='mt-6'>
             <Button
               onClick={handleBegin}
               disabled={createStory.isPending}
