@@ -1,11 +1,11 @@
 import { ORPCError } from '@orpc/server';
-import { Language } from '@untold/db';
 import {
   generateStoryDraft,
   generateSynopsis,
   isAiConfigured,
   suggestStoryDirections,
 } from '@untold/ai';
+import { Language } from '@untold/db';
 import { z } from 'zod';
 
 import type { Context } from '../context';
@@ -38,7 +38,8 @@ async function loadChapterWithNotes(
   });
   if (notes.length === 0) {
     throw new ORPCError('BAD_REQUEST', {
-      message: 'Add a note to this chapter first — Untold needs something to work with.',
+      message:
+        'Add a note to this chapter first — Untold needs something to work with.',
     });
   }
   return { chapter, notes };
@@ -75,15 +76,30 @@ export const aiRouter = {
         context.session.user.id,
       );
 
+      // Once the chapter already has writing, only the notes not yet folded
+      // in should drive the next generation — otherwise every regenerate
+      // rewrites the chapter from scratch instead of continuing it.
+      const hasExistingContent = chapter.content.trim().length > 0;
+      const relevantNotes = hasExistingContent
+        ? notes.filter((note) => !note.usedInDraft)
+        : notes;
+
+      if (hasExistingContent && relevantNotes.length === 0) {
+        throw new ORPCError('BAD_REQUEST', {
+          message: 'All your notes are already part of this chapter.',
+        });
+      }
+
       const draft = await generateStoryDraft({
-        notes: notes.map((note) => note.content),
+        notes: relevantNotes.map((note) => note.content),
         title: chapter.story.title,
         topic: chapter.story.topic ?? undefined,
         aiInstructions: chapter.story.aiInstructions ?? undefined,
         language: LANGUAGE_NAME[chapter.story.language],
+        existingContent: hasExistingContent ? chapter.content : undefined,
       });
 
-      return { draft };
+      return { draft, noteIds: relevantNotes.map((note) => note.id) };
     }),
 
   // Not wired up in the UI yet. Notes now live per-chapter, so a

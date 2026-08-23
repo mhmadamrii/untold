@@ -99,8 +99,21 @@ export async function generateStoryDraft(input: {
   topic?: string;
   aiInstructions?: string;
   language?: string;
+  existingContent?: string;
 }): Promise<string> {
   const google = getGoogleProvider();
+
+  const instruction = input.existingContent
+    ? [
+        'Continue the chapter directly from where it leaves off, turning',
+        'the new notes above into the next one to two paragraphs. Do not',
+        'repeat or rewrite anything already written above — write only the',
+        'new continuation text.',
+      ].join(' ')
+    : [
+        'Write a short opening passage (one to two paragraphs) turning',
+        'these notes into the start of a real chapter.',
+      ].join(' ');
 
   const prompt = [
     input.title ? `Working title: ${input.title}` : null,
@@ -108,13 +121,15 @@ export async function generateStoryDraft(input: {
     input.aiInstructions
       ? `Direction to follow: ${input.aiInstructions}`
       : null,
+    input.existingContent
+      ? `\nChapter written so far:\n${input.existingContent}`
+      : null,
     '',
-    'Notes:',
+    input.existingContent ? 'New notes to continue from:' : 'Notes:',
     ...input.notes.map((note, index) => `${index + 1}. ${note}`),
     '',
-    'Write a short opening passage (one to two paragraphs) turning these',
-    "notes into the start of a real chapter. Stay true to the notes' facts",
-    "and tone — don't invent new events.",
+    instruction,
+    "Stay true to the notes' facts and tone — don't invent new events.",
   ]
     .filter(Boolean)
     .join('\n');

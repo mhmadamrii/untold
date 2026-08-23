@@ -16,6 +16,7 @@ import {
 import { Textarea } from '@untold/ui/components/textarea';
 import { cn } from '@untold/ui/lib/utils';
 import {
+  CheckIcon,
   ChevronDownIcon,
   GripVertical,
   PlusIcon,
@@ -26,7 +27,7 @@ import { toast } from 'sonner';
 
 import { orpc } from '@/utils/orpc';
 
-export type NoteItem = { id: string; content: string };
+export type NoteItem = { id: string; content: string; usedInDraft: boolean };
 
 export type NotesPanelHandle = {
   openComposerWithPrompt: (text: string) => void;
@@ -86,7 +87,10 @@ function NoteRow({
     <div
       ref={ref}
       className={cn(
-        'flex gap-2 rounded-md border border-border bg-card p-3',
+        'flex gap-2 rounded-md border p-3',
+        note.usedInDraft
+          ? 'border-primary/25 bg-primary/5'
+          : 'border-border bg-card',
         isDragging && 'opacity-50',
       )}
     >
@@ -111,14 +115,22 @@ function NoteRow({
         }}
         className='min-h-16 flex-1 resize-none border-none bg-transparent p-0 text-sm focus-visible:ring-0'
       />
-      <button
-        type='button'
-        onClick={() => onDelete(note.id)}
-        className='mt-1 shrink-0 text-muted-foreground hover:text-destructive'
-        aria-label='Delete note'
-      >
-        <Trash2Icon className='size-3.5' />
-      </button>
+      <div className='mt-1 flex shrink-0 flex-col items-center gap-2'>
+        {note.usedInDraft && (
+          <span title='Already in this chapter'>
+            <CheckIcon className='size-3.5 text-primary' />
+            <span className='sr-only'>Already in this chapter</span>
+          </span>
+        )}
+        <button
+          type='button'
+          onClick={() => onDelete(note.id)}
+          className='text-muted-foreground hover:text-destructive'
+          aria-label='Delete note'
+        >
+          <Trash2Icon className='size-3.5' />
+        </button>
+      </div>
     </div>
   );
 }
@@ -156,6 +168,7 @@ export const NotesPanel = forwardRef<
 
   const [localNotes, setLocalNotes] = useState(notes);
   const [proposal, setProposal] = useState<string | null>(null);
+  const [pendingNoteIds, setPendingNoteIds] = useState<string[]>([]);
   const [aiUnavailable, setAiUnavailable] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [draftText, setDraftText] = useState('');
@@ -176,7 +189,9 @@ export const NotesPanel = forwardRef<
     }
   }, [description]);
 
-  const notesKey = notes.map((note) => note.id).join(',');
+  const notesKey = notes
+    .map((note) => `${note.id}:${note.usedInDraft}`)
+    .join(',');
   // Resync only when the set/order of note ids changes (add, delete, or a
   // reorder echoed back from the server) — not on every notes.map() call,
   // which would otherwise fight with in-flight local drag reordering.
@@ -226,6 +241,7 @@ export const NotesPanel = forwardRef<
       onSuccess: (data) => {
         setAiUnavailable(false);
         setProposal(data.draft);
+        setPendingNoteIds(data.noteIds);
       },
       onError: (error) => {
         if (
@@ -238,6 +254,13 @@ export const NotesPanel = forwardRef<
         }
         toast.error(error.message);
       },
+    }),
+  );
+
+  const markNotesUsed = useMutation(
+    orpc.note.markUsed.mutationOptions({
+      onSuccess: () => onNotesChanged(),
+      onError: (error) => toast.error(error.message),
     }),
   );
 
@@ -335,7 +358,16 @@ export const NotesPanel = forwardRef<
       return;
     }
     onUseProposal(proposal);
+    if (pendingNoteIds.length > 0) {
+      markNotesUsed.mutate({ chapterId, noteIds: pendingNoteIds });
+    }
     setProposal(null);
+    setPendingNoteIds([]);
+  }
+
+  function handleDismissProposal() {
+    setProposal(null);
+    setPendingNoteIds([]);
   }
 
   const synopsisWordCount = countWords(description ?? '');
@@ -396,7 +428,7 @@ export const NotesPanel = forwardRef<
                   <Button
                     size='sm'
                     variant='ghost'
-                    onClick={() => setProposal(null)}
+                    onClick={handleDismissProposal}
                   >
                     Dismiss
                   </Button>

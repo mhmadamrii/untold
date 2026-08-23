@@ -114,4 +114,39 @@ export const noteRouter = {
       );
       return { success: true };
     }),
+
+  markUsed: protectedProcedure
+    .input(
+      z.object({
+        chapterId: z.string(),
+        noteIds: z.array(z.string()).min(1),
+      }),
+    )
+    .handler(async ({ input, context }) => {
+      await findOwnedChapter(
+        context.db,
+        input.chapterId,
+        context.session.user.id,
+      );
+
+      // Verify noteIds belongs to this chapter before writing — same
+      // ownership guard as reorder above.
+      const existing = await context.db.note.findMany({
+        where: { chapterId: input.chapterId },
+        select: { id: true },
+      });
+      const existingIds = new Set(existing.map((note) => note.id));
+      const isValidSet = input.noteIds.every((id) => existingIds.has(id));
+      if (!isValidSet) {
+        throw new ORPCError('BAD_REQUEST', {
+          message: "Note list doesn't match this chapter.",
+        });
+      }
+
+      await context.db.note.updateMany({
+        where: { id: { in: input.noteIds } },
+        data: { usedInDraft: true },
+      });
+      return { success: true };
+    }),
 };
