@@ -100,6 +100,7 @@ export async function generateStoryDraft(input: {
   aiInstructions?: string;
   language?: string;
   existingContent?: string;
+  storySoFar?: string;
 }): Promise<string> {
   const google = getGoogleProvider();
 
@@ -121,6 +122,9 @@ export async function generateStoryDraft(input: {
     input.aiInstructions
       ? `Direction to follow: ${input.aiInstructions}`
       : null,
+    input.storySoFar
+      ? `\nThe story so far (earlier chapters):\n${input.storySoFar}`
+      : null,
     input.existingContent
       ? `\nChapter written so far:\n${input.existingContent}`
       : null,
@@ -130,6 +134,9 @@ export async function generateStoryDraft(input: {
     '',
     instruction,
     "Stay true to the notes' facts and tone — don't invent new events.",
+    input.storySoFar
+      ? 'Stay consistent with the characters, events, and details already established in the story so far.'
+      : null,
   ]
     .filter(Boolean)
     .join('\n');

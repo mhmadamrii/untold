@@ -8,10 +8,10 @@ import {
   SheetTrigger,
 } from '@untold/ui/components/sheet';
 import { Menu } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { LogoMark } from './logo-mark';
 import { ModeToggle } from './mode-toggle';
 import UserMenu from './user-menu';
 
@@ -37,7 +37,7 @@ export default function Header() {
           href='/'
           className='flex items-center gap-2 cn-font-heading text-xl tracking-tight'
         >
-          <Image src='/logo.png' alt='' width={28} height={28} />
+          <LogoMark />
           Untold
         </Link>
         <div className='flex items-center gap-4 sm:gap-6'>

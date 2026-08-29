@@ -1,16 +1,17 @@
 import { Button } from '@untold/ui/components/button';
+import Image from 'next/image';
 import Link from 'next/link';
 import { PopularStories } from '@/components/popular-stories';
 
 export default function LandingPage() {
   return (
     <div className='px-6'>
-      <section className='mx-auto grid max-w-6xl gap-12 py-20 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:py-28'>
+      <section className='mx-auto grid max-w-6xl gap-12 py-20 md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:items-center md:py-28'>
         <div>
           <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
             A home for the stories people carry
           </p>
-          <h1 className='cn-font-heading mt-3 text-4xl leading-[1.05] font-semibold sm:text-5xl'>
+          <h1 className='cn-font-heading mt-3 text-5xl leading-[1.05] font-normal sm:text-6xl'>
             Everyone has an untold story.
           </h1>
           <p className='mt-6 max-w-md text-base text-muted-foreground'>
@@ -37,14 +38,19 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <figure>
-          <div className='cn-plate aspect-[4/5] bg-secondary grid place-items-center'>
-            <span className='text-xs uppercase tracking-widest text-muted-foreground'>
-              Placeholder Image
-            </span>
+        <figure className='mx-auto w-full max-w-sm md:mx-0'>
+          <div className='cn-plate overflow-hidden'>
+            <Image
+              src='/illustration.jpeg'
+              alt="A hand-drawn illustration of a writer at a desk, a wisp of smoke from her pen drifting up into a sketch of a house behind an old tree: the memory taking shape on the page."
+              width={1200}
+              height={896}
+              className='h-auto w-full'
+              priority
+            />
           </div>
           <figcaption className='cn-font-reading mt-3 text-sm text-muted-foreground italic'>
-            A reader's desk, warm daylight.
+            Every story starts as a memory looking for its shape.
           </figcaption>
         </figure>
       </section>
@@ -79,8 +85,8 @@ export default function LandingPage() {
               body: 'Pick a direction, write the first chapter, and come back to continue whenever the next part of the story is ready to be told.',
             },
           ].map((step) => (
-            <div key={step.number} className='p-8 first:pt-0 md:first:pl-0 md:last:pr-0'>
-              <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
+            <div key={step.number} className='p-8 first:pt-0 md:first:pt-8'>
+              <p className='cn-font-heading text-3xl text-primary'>
                 {step.number}
               </p>
               <p className='cn-font-heading mt-3 text-lg'>{step.title}</p>
@@ -143,7 +149,7 @@ export default function LandingPage() {
       <div className='mx-auto h-px max-w-6xl bg-border' />
 
       <section className='mx-auto max-w-6xl py-20 text-center md:py-28'>
-        <h2 className='cn-font-heading mx-auto max-w-2xl text-3xl sm:text-4xl'>
+        <h2 className='cn-font-heading mx-auto max-w-2xl text-4xl font-normal sm:text-5xl'>
           Private, until you decide otherwise.
         </h2>
         <p className='mx-auto mt-4 max-w-md text-sm text-muted-foreground'>

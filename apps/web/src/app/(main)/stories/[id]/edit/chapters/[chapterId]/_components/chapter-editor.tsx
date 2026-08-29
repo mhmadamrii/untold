@@ -16,7 +16,6 @@ import {
 import { Badge } from '@untold/ui/components/badge';
 import { Button } from '@untold/ui/components/button';
 import { Input } from '@untold/ui/components/input';
-import { ScrollArea } from '@untold/ui/components/scroll-area';
 import {
   Select,
   SelectContent,
@@ -27,12 +26,12 @@ import {
 import { Textarea } from '@untold/ui/components/textarea';
 import { cn } from '@untold/ui/lib/utils';
 import { Trash2Icon } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
+import { LogoMark } from '@/components/logo-mark';
 import { ShareDialog } from '@/components/share-dialog';
 import { formatRelativeDate } from '@/lib/format-date';
 import { LANGUAGE_LABEL, VISIBILITY_LABEL } from '@/lib/story-labels';
@@ -276,14 +275,14 @@ export function ChapterEditor({
   }
 
   return (
-    <div className='flex min-h-screen flex-col lg:h-screen lg:overflow-hidden'>
+    <div className='flex min-h-screen flex-col lg:h-screen lg:min-h-0 lg:overflow-hidden'>
       <div className='flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3 lg:px-6'>
         <div className='flex min-w-0 items-center gap-3'>
           <Link
             href='/'
             className='flex shrink-0 items-center gap-2 cn-font-heading text-sm'
           >
-            <Image src='/logo.png' alt='' width={18} height={18} />
+            <LogoMark className='size-[18px] text-[10px]' />
             Untold
           </Link>
           <span className='hidden text-border sm:inline'>|</span>
@@ -299,7 +298,7 @@ export function ChapterEditor({
             onChange={(event) => setStoryTitle(event.target.value)}
             onBlur={handleStoryTitleBlur}
             placeholder='Untitled story'
-            className='h-auto min-w-0 max-w-[220px] border-none bg-transparent p-0 cn-font-heading text-sm focus-visible:ring-0'
+            className='h-auto min-w-0 max-w-[220px] border-none bg-transparent p-0 cn-font-heading text-sm focus-visible:ring-0 dark:bg-transparent'
           />
           {story.data && (
             <Badge className='shrink-0'>
@@ -325,7 +324,7 @@ export function ChapterEditor({
                   })
                 }
               >
-                <SelectTrigger className='h-auto gap-1 border-none bg-transparent p-0 text-xs text-muted-foreground shadow-none hover:text-foreground'>
+                <SelectTrigger className='h-auto gap-1 border-none bg-transparent p-0 text-xs text-muted-foreground shadow-none hover:text-foreground dark:bg-transparent dark:hover:bg-transparent'>
                   <SelectValue>{(value: string) => value}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -367,9 +366,9 @@ export function ChapterEditor({
         </div>
       </div>
 
-      <div className='grid flex-1 grid-cols-1 lg:grid-cols-[30%_40%_30%] lg:overflow-hidden'>
-        <aside className='flex flex-col border-b border-border lg:h-full lg:overflow-hidden lg:border-r lg:border-b-0'>
-          <div className='flex-1 overflow-y-auto py-4'>
+      <div className='flex flex-1 flex-col lg:min-h-0 lg:flex-row lg:overflow-hidden'>
+        <aside className='flex flex-col border-b border-border lg:h-full lg:min-h-0 lg:w-[30%] lg:shrink-0 lg:overflow-hidden lg:border-r lg:border-b-0'>
+          <div className='min-h-0 flex-1 overflow-y-auto py-4'>
             <div className='flex items-baseline justify-between gap-2 px-4'>
               <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
                 Chapters
@@ -479,8 +478,8 @@ export function ChapterEditor({
           </div>
         </aside>
 
-        <main className='flex flex-col lg:h-full lg:overflow-hidden'>
-          <ScrollArea className='flex-1'>
+        <main className='flex flex-col lg:h-full lg:min-h-0 lg:flex-1 lg:overflow-hidden'>
+          <div className='min-h-0 flex-1 overflow-y-auto'>
             <div className='mx-auto w-full max-w-3xl px-6 py-10 sm:px-10'>
               <div className='flex flex-wrap items-baseline justify-between gap-2'>
                 <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
@@ -495,15 +494,15 @@ export function ChapterEditor({
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder='Chapter title'
-                className='cn-font-heading mt-2 h-auto border-none bg-transparent px-0 text-3xl focus-visible:ring-0'
+                className='cn-font-heading mt-2 h-auto border-none bg-transparent px-0 text-3xl focus-visible:ring-0 dark:bg-transparent'
               />
-              <div className='mt-6 rounded-md bg-secondary/40 p-6 sm:p-10'>
+              <div className='mt-6 rounded-md bg-secondary/40 p-4 sm:p-6'>
                 <Textarea
                   ref={contentRef}
                   value={content}
                   onChange={(event) => setContent(event.target.value)}
                   placeholder='Begin your chapter…'
-                  className='cn-font-reading min-h-[50vh] w-full resize-none border-none bg-transparent p-0 text-base focus-visible:ring-0'
+                  className='cn-font-reading min-h-[50vh] w-full resize-none border-none bg-transparent p-0 text-lg focus-visible:ring-0 dark:bg-transparent'
                 />
               </div>
               <div className='mt-6 flex flex-wrap items-center gap-2 rounded-md border border-primary/30 bg-primary/8 px-4 py-3'>
@@ -526,10 +525,10 @@ export function ChapterEditor({
                 ))}
               </div>
             </div>
-          </ScrollArea>
+          </div>
         </main>
 
-        <aside className='flex flex-col border-t border-border lg:h-full lg:overflow-hidden lg:border-t-0 lg:border-l'>
+        <aside className='flex flex-col border-t border-border lg:h-full lg:min-h-0 lg:w-[30%] lg:shrink-0 lg:overflow-hidden lg:border-t-0 lg:border-l'>
           <NotesPanel
             ref={notesPanelRef}
             storyId={storyId}

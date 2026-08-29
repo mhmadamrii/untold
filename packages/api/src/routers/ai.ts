@@ -26,6 +26,36 @@ const LANGUAGE_NAME: Record<Language, string> = {
   [Language.INDONESIAN]: 'Indonesian',
 };
 
+// Keeps chapter generation aware of what already happened in the story —
+// without this, each chapter is written in isolation and reads like a
+// different story. Capped and biased toward the most recent chapters so
+// long stories don't blow up the prompt.
+const STORY_SO_FAR_CHAR_BUDGET = 6000;
+
+function buildStorySoFar(
+  priorChapters: { title: string; content: string }[],
+): string | undefined {
+  const withText = priorChapters.filter(
+    (chapter) => chapter.content.trim().length > 0,
+  );
+  if (withText.length === 0) {
+    return undefined;
+  }
+
+  const sections: string[] = [];
+  let used = 0;
+  for (let i = withText.length - 1; i >= 0; i--) {
+    const chapter = withText[i] as { title: string; content: string };
+    const section = `${chapter.title}:\n${chapter.content.trim()}`;
+    if (used + section.length > STORY_SO_FAR_CHAR_BUDGET && sections.length > 0) {
+      break;
+    }
+    sections.unshift(section);
+    used += section.length;
+  }
+  return sections.join('\n\n');
+}
+
 async function loadChapterWithNotes(
   db: Context['db'],
   chapterId: string,
@@ -90,6 +120,12 @@ export const aiRouter = {
         });
       }
 
+      const priorChapters = await context.db.chapter.findMany({
+        where: { storyId: chapter.storyId, order: { lt: chapter.order } },
+        orderBy: { order: 'asc' },
+        select: { title: true, content: true },
+      });
+
       const draft = await generateStoryDraft({
         notes: relevantNotes.map((note) => note.content),
         title: chapter.story.title,
@@ -97,6 +133,7 @@ export const aiRouter = {
         aiInstructions: chapter.story.aiInstructions ?? undefined,
         language: LANGUAGE_NAME[chapter.story.language],
         existingContent: hasExistingContent ? chapter.content : undefined,
+        storySoFar: buildStorySoFar(priorChapters),
       });
 
       return { draft, noteIds: relevantNotes.map((note) => note.id) };

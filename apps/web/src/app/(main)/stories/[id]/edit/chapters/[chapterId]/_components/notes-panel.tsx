@@ -113,7 +113,7 @@ function NoteRow({
             setContent(note.content);
           }
         }}
-        className='min-h-16 flex-1 resize-none border-none bg-transparent p-0 text-sm focus-visible:ring-0'
+        className='min-h-16 flex-1 resize-none border-none bg-transparent p-0 text-sm focus-visible:ring-0 dark:bg-transparent'
       />
       <div className='mt-1 flex shrink-0 flex-col items-center gap-2'>
         {note.usedInDraft && (
@@ -374,7 +374,7 @@ export const NotesPanel = forwardRef<
 
   return (
     <>
-      <div className='flex-1 overflow-y-auto p-4 lg:p-6'>
+      <div className='min-h-0 flex-1 overflow-y-auto p-4 lg:p-6'>
         <div className='flex items-center justify-between gap-2'>
           <p className='cn-font-heading text-xs uppercase tracking-[0.14em] text-primary'>
             Companion
@@ -537,7 +537,7 @@ export const NotesPanel = forwardRef<
                   <Textarea
                     value={synopsisDraft}
                     onChange={(event) => setSynopsisDraft(event.target.value)}
-                    className='min-h-24 resize-none border-none bg-transparent p-0 text-sm focus-visible:ring-0'
+                    className='min-h-24 resize-none border-none bg-transparent p-0 text-sm focus-visible:ring-0 dark:bg-transparent'
                     autoFocus
                   />
                 ) : (

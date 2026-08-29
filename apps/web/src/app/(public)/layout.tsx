@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { LogoMark } from '@/components/logo-mark';
 
 export default function PublicLayout({
   children,
@@ -10,7 +10,7 @@ export default function PublicLayout({
         <div className='mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 px-6 py-10 sm:flex-row sm:items-center'>
           <div>
             <p className='flex items-center gap-2 cn-font-heading text-lg'>
-              <Image src='/logo.png' alt='' width={20} height={20} />
+              <LogoMark className='size-5 text-xs' />
               Untold
             </p>
             <p className='mt-1 text-sm text-muted-foreground'>

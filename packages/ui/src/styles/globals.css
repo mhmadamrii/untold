@@ -53,19 +53,23 @@
   --foreground: #f8f4f4;
   --card: #1c1a17;
   --card-foreground: #f8f4f4;
-  --popover: #262219;
+  --popover: #413a30;
   --popover-foreground: #f8f4f4;
   --primary: #e1ad66;
   --primary-foreground: #3a270d;
-  --secondary: #2a251e;
+  --secondary: #332e27;
   --secondary-foreground: #f8f4f4;
-  --muted: #2a251e;
+  --muted: #332e27;
   --muted-foreground: #bab6b6;
   --accent: #3a270d;
   --accent-foreground: #ffe3bf;
   --destructive: #c17a68;
-  --border: color-mix(in srgb, #f8f4f4 14%, transparent);
-  --input: color-mix(in srgb, #f8f4f4 16%, transparent);
+  /* Dark surfaces need much more border contrast than the light hairline
+     mix to clear WCAG 1.4.11 (3:1 for UI boundaries) — 14%/16% white over
+     a near-black base measures ~1.3:1, effectively invisible, which is why
+     cards/buttons/inputs read as flat. */
+  --border: color-mix(in srgb, #f8f4f4 34%, transparent);
+  --input: color-mix(in srgb, #f8f4f4 38%, transparent);
   --ring: #e1ad66;
   --chart-1: #facb8d;
   --chart-2: #e1ad66;
